@@ -34,25 +34,18 @@ JNIEXPORT jobject JNICALL Java_be_derycke_pieter_com_COM_CoCreateInstance
 	//maar doet het voor nu wel
 	hr = CoCreateInstance(rclsid, (LPUNKNOWN)pUnkOuter, dwClsContext, riid, &reference);
 
-	if(FAILED(hr))
+	if(SUCCEEDED(hr))
 	{
-		jobject exception;
-		jstring message;
+		//smart reference object aanmaken
+		cls = env->FindClass("be/derycke/pieter/com/COMReference");
+		mid = env->GetMethodID(cls, "<init>", "(J)V");
 
-		cls = env->FindClass("be/derycke/pieter/com/COMException");
-		mid = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
-		message = env->NewStringUTF("Fout opgetreden in de native code!");
-		exception = env->NewObject(cls, mid, message, hr);
-
-		env->Throw((jthrowable)exception);
+		return env->NewObject(cls, mid, reference);
+	}
+	else {
+		ThrowCOMException(env, L"Couldn't create the COM-object", hr);
 		return NULL;
 	}
-
-	//smart reference object aanmaken
-	cls = env->FindClass("be/derycke/pieter/com/COMReference");
-	mid = env->GetMethodID(cls, "<init>", "(J)V");
-
-	return env->NewObject(cls, mid, reference);
 }
 
 JNIEXPORT jlong JNICALL Java_be_derycke_pieter_com_COMReference_release
