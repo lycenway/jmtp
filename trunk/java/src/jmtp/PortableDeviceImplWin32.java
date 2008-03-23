@@ -131,7 +131,7 @@ class PortableDeviceImplWin32 implements PortableDevice {
             PortableDevicePropertiesImplWin32 properties = 
                     content.getProperties();
 
-            String[] childIDs = content.listChildObjects("s10001");
+            String[] childIDs = content.listChildObjects(Win32WPDDefines.WPD_DEVICE_OBJECT_ID);
             PortableDeviceObject[] objects = new PortableDeviceObject[childIDs.length];
             for(int i = 0; i < childIDs.length; i++)
             	objects[i] = WPDImplWin32.convertToPortableDeviceObject(childIDs[i], content, properties);

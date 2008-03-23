@@ -78,7 +78,7 @@ public class PropertyKeyReader {
     					String[] parts = line.trim().split(" ");
     					
     					if(parts[2].startsWith("L\"") && parts[2].endsWith("\"")) {
-    						processString(parts[1], parts[2].substring(2, parts[2].length() - 2));
+    						processString(parts[1], parts[2].substring(2, parts[2].length() - 1));
     					}    					
     				}
     				
