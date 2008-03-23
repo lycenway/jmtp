@@ -2,7 +2,21 @@
 #include <atlbase.h>
 #include <jni.h>
 
-#include "jwpd.h"
+#include "jmtp.h"
+
+void ThrowCOMException(JNIEnv* env, LPWSTR message, HRESULT hr)
+{
+		jclass cls;
+		jmethodID mid;
+		jstring jsMessage;
+		jobject exception;
+
+		cls = env->FindClass("be/derycke/pieter/com/COMException");
+		mid = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+		jsMessage = env->NewString((jchar*)message, wcslen(message));
+		exception = env->NewObject(cls, mid, jsMessage, (jint)hr);
+		env->Throw((jthrowable)exception);
+}
 
 jobject ConvertGuidToJava(JNIEnv* env, GUID guid)
 {
