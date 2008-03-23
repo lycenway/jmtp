@@ -28,7 +28,7 @@ import be.derycke.pieter.com.COMReference;
  */
 class PortableDevicePropertiesImplWin32 {
     
-    @SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	private COMReference pDeviceProperties;
     
     PortableDevicePropertiesImplWin32(COMReference pDeviceProperties) {
