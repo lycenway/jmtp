@@ -84,10 +84,12 @@ class WPDImplWin32 {
     	    	else
     	    		keyCollection.clear();
     			keyCollection.add(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE);
+    			keyCollection.add(Win32WPDDefines.WPD_FUNCTIONAL_OBJECT_CATEGORY);
     			values = properties.getValues(objectID, keyCollection);
 			}
     		
     		Guid contentType = values.getGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE);
+    		System.out.println(contentType.toString());
 	    	
             if(contentType.equals(Win32WPDDefines.WPD_CONTENT_TYPE_FOLDER)) {
                 return new PortableDeviceFolderObjectImplWin32(objectID, content, properties);
@@ -97,6 +99,20 @@ class WPDImplWin32 {
             }
             else if(contentType.equals(Win32WPDDefines.WPD_CONTENT_TYPE_PLAYLIST)) {
             	return new PortableDevicePlaylistObjectImplWin32(objectID, content, properties);
+            }
+            else if(contentType.equals(Win32WPDDefines.WPD_CONTENT_TYPE_FUNCTIONAL_OBJECT)) {
+            	//nagaan welk subtype
+            	Guid category = values.getGuidValue(Win32WPDDefines.WPD_FUNCTIONAL_OBJECT_CATEGORY);
+            	if(category.equals(Win32WPDDefines.WPD_FUNCTIONAL_CATEGORY_STORAGE)) {
+            		return new PortableDeviceStorageObjectImplWin32(objectID, content, properties);
+            	}
+            	else if(category.equals(Win32WPDDefines.WPD_FUNCTIONAL_CATEGORY_RENDERING_INFORMATION)) {
+            		return new PortableDeviceRenderingInformationObjectImplWin32(objectID, content, properties);
+            	}
+            	else {
+            		//basis object terug geven
+            		return new PortableDeviceObjectImplWin32(objectID, content, properties);
+            	}
             }
             else {
                 return new PortableDeviceObjectImplWin32(objectID, content, properties);
