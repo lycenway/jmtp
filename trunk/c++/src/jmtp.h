@@ -1,65 +1,39 @@
+/*
+ * Copyright 2007 Pieter De Rycke
+ * 
+ * This file is part of JMTP.
+ * 
+ * JTMP is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as 
+ * published by the Free Software Foundation, either version 3 of 
+ * the License, or any later version.
+ * 
+ * JMTP is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU LesserGeneral Public 
+ * License along with JMTP. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <objbase.h>
 #include <atlbase.h>
 #include <jni.h>
 
-inline GUID ConvertToGUID(JNIEnv* env, jobject jGuid)
-{
-	GUID guid;
-	jmethodID mid;
-	jclass cls;
-
-	cls = env->GetObjectClass(jGuid);
-
-	mid	= env->GetMethodID(cls, "getData1", "()J");
-	guid.Data1 = env->CallLongMethod(jGuid, mid);
-
-	mid = env->GetMethodID(cls, "getData2", "()I");
-	guid.Data2 = env->CallIntMethod(jGuid, mid);
-
-	mid = env->GetMethodID(cls, "getData3", "()I");
-	guid.Data3 = env->CallIntMethod(jGuid, mid);
-
-	mid = env->GetMethodID(cls, "getData4", "()[S");
-	jshort* data4 = env->GetShortArrayElements((jshortArray)env->CallObjectMethod(jGuid, mid), NULL);
-	for(int i = 0; i < 8; i++)
-		guid.Data4[i] = data4[i];
-
-	return guid;
-}
-
-inline PROPERTYKEY ConvertToPROPERTYKEY(JNIEnv* env, jobject jKey)
-{
-	PROPERTYKEY key;
-	jmethodID mid;
-	jclass cls;
-	jobject jGuid;
-
-	cls = env->FindClass("be/derycke/pieter/wpd/PropertyKey");
-
-	mid = env->GetMethodID(cls, "getPid", "()J");
-	key.pid = env->CallLongMethod(jKey, mid);
-
-	mid = env->GetMethodID(cls, "getFmtid", "()Lbe/derycke/pieter/com/Guid;");
-	jGuid = env->CallObjectMethod(jKey, mid);
-	key.fmtid = ConvertToGUID(env, jGuid);
-
-	return key;
-}
+void ThrowCOMException(JNIEnv* env, LPWSTR message, HRESULT hr);
 
 jobject ConvertGuidToJava(JNIEnv* env, GUID guid);
+GUID ConvertJavaToGuid(JNIEnv* env, jobject jGuid);
 
 jobject ConvertPropertyKeyToJava(JNIEnv* env, PROPERTYKEY key);
-
-PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant);
+PROPERTYKEY ConvertJavaToPropertyKey(JNIEnv* env, jobject jKey);
 
 jobject ConvertPropVariantToJava(JNIEnv* env, PROPVARIANT pv);
+PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant);
 
 jobject RetrieveCOMReferenceFromCOMReferenceable(JNIEnv* env, jobject jobjCOMReferenceable);
-
 jlong GetComReference(JNIEnv* env, jobject obj, const char* fieldName);
-
-inline jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference);
-
-void ThrowCOMException(JNIEnv* env, LPWSTR message, HRESULT hr);
+jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference);

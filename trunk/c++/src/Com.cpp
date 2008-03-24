@@ -1,9 +1,28 @@
+/*
+ * Copyright 2007 Pieter De Rycke
+ * 
+ * This file is part of JMTP.
+ * 
+ * JTMP is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as 
+ * published by the Free Software Foundation, either version 3 of 
+ * the License, or any later version.
+ * 
+ * JMTP is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU LesserGeneral Public 
+ * License along with JMTP. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <objbase.h>
 
 #include "be_derycke_pieter_com_COM.h"
 #include "be_derycke_pieter_com_COMReference.h"
 
-#include "jwpd.h"
+#include "jmtp.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
@@ -27,8 +46,8 @@ JNIEXPORT jobject JNICALL Java_be_derycke_pieter_com_COM_CoCreateInstance
 	jclass cls;
 	jmethodID mid;
 
-	rclsid = ConvertToGUID(env, rclsidObj);
-	riid = ConvertToGUID(env, riidObj);
+	rclsid = ConvertJavaToGuid(env, rclsidObj);
+	riid = ConvertJavaToGuid(env, riidObj);
 
 	//niet 100% want een dword is een unsigned long een een jlong een signed long
 	//maar doet het voor nu wel
