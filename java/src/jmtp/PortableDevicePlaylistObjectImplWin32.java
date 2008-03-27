@@ -45,7 +45,7 @@ class PortableDevicePlaylistObjectImplWin32 extends PortableDeviceObjectImplWin3
             	new PortableDeviceObjectImplWin32[(int)propVariantCollection.count()];
             for(int i = 0; i < references.length; i++) {
             	references[i] = WPDImplWin32.convertToPortableDeviceObject(
-            			propVariantCollection.getAt(i).getValue(), content, properties);
+            			(String)propVariantCollection.getAt(i).getValue(), content, properties);
             }
             return references;
             	
