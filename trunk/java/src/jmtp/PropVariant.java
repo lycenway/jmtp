@@ -27,14 +27,15 @@ class PropVariant {
     
 	public static final int VT_EMPTY = 0;
 	public static final int VT_NULL = 1;
+	public static final int VT_BOOL = 11;
 	public static final int VT_LPSTR = 30;
     public static final int VT_LPWSTR = 31;	//A pointer to a null-terminated Unicode string in the user default locale.
     
-    private int vt;
     
+    private int vt;
     private Object value;
 
-    PropVariant(int vt, Object value) {
+    private PropVariant(int vt, Object value) {
         this.vt = vt;
         this.value = value;
     }
@@ -47,14 +48,15 @@ class PropVariant {
     	this(VT_LPWSTR, value);
     }
     
+    public PropVariant(boolean value) {
+    	this(VT_BOOL, value);
+    }
+    
     public int getVt() {
         return vt;
     }
     
     public Object getValue() {
-    	if(vt == VT_LPWSTR || vt == vt)
-    		return (String)value;
-    	else
-    		return null;
+    	return value;
     }
 }

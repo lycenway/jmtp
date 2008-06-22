@@ -19,28 +19,11 @@
 
 package jmtp;
 
-import be.derycke.pieter.com.COMException;
-
-class PortableDeviceStorageObjectImplWin32 extends PortableDeviceObjectImplWin32 implements PortableDeviceStorageObject {
+class PortableDeviceStorageObjectImplWin32 extends AbstractPortableDeviceContainerImplWin32 implements PortableDeviceStorageObject {
 
 	PortableDeviceStorageObjectImplWin32(String objectID, PortableDeviceContentImplWin32 content,
 			PortableDevicePropertiesImplWin32 properties) {
 		
 		super(objectID, content, properties);
 	}
-
-	public PortableDeviceObject[] getChildObjects() {
-        try {
-            String[] childIDs = content.listChildObjects(objectID);
-            PortableDeviceObject[] objects = new PortableDeviceObject[childIDs.length];
-            for(int i = 0; i < childIDs.length; i++)
-            	objects[i] = WPDImplWin32.convertToPortableDeviceObject(childIDs[i], this.content, this.properties);
-            
-            return objects;
-        }
-        catch (COMException e) {
-            return new PortableDeviceObject[0];
-        }
-    }
-
 }

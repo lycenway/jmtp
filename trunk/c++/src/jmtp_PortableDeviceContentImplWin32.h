@@ -44,6 +44,14 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectW
 
 /*
  * Class:     jmtp_PortableDeviceContentImplWin32
+ * Method:    delete
+ * Signature: (ILjmtp/PortableDevicePropVariantCollectionImplWin32;)V
+ */
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceContentImplWin32_delete
+  (JNIEnv *, jobject, jint, jobject);
+
+/*
+ * Class:     jmtp_PortableDeviceContentImplWin32
  * Method:    listChildObjects
  * Signature: (Ljava/lang/String;)[Ljava/lang/String;
  */
@@ -57,6 +65,14 @@ JNIEXPORT jobjectArray JNICALL Java_jmtp_PortableDeviceContentImplWin32_listChil
  */
 JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceContentImplWin32_getProperties
   (JNIEnv *, jobject);
+
+/*
+ * Class:     jmtp_PortableDeviceContentImplWin32
+ * Method:    getObjectIDsFromPersistentUniqueIDs
+ * Signature: (Ljmtp/PortableDevicePropVariantCollectionImplWin32;)Ljmtp/PortableDevicePropVariantCollectionImplWin32;
+ */
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceContentImplWin32_getObjectIDsFromPersistentUniqueIDs
+  (JNIEnv *, jobject, jobject);
 
 /*
  * Class:     jmtp_PortableDeviceContentImplWin32

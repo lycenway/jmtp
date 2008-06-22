@@ -51,7 +51,7 @@ class PortableDevicePlaylistObjectImplWin32 extends PortableDeviceObjectImplWin3
             	
         }
         catch(COMException e) {
-            return null;
+            return new PortableDeviceObject[0];
         }
 	}
 

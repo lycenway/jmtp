@@ -32,4 +32,6 @@ public interface PortableDevice {
     public void open();
     public void close();
     public PortableDeviceObject[] getRootObjects();
+    public PortableDeviceObject[] getPortableDeviceObjectsFromPersistentUniqueIDs(String[] persistentUniqueIDs);
+    public PortableDeviceObject getPortableDeviceObjectsFromPersistentUniqueIDs(String persistentUniqueID);
 }

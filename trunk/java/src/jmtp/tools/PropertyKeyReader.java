@@ -27,8 +27,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import be.derycke.pieter.com.Guid;
+
 /**
- *
+ * TODO pla ondersteuning missing in PortableDevice.h
+ *	static final Guid WPD_OBJECT_FORMAT_PLA = new Guid(0xBA050000, 0xAE6C, 0x4804, new short[]{0x98, 0xBA, 0xC5, 0x7B, 0x46, 0x96, 0x5F, 0xe7});
+ * 
  * @author Pieter De Rycke
  */
 public class PropertyKeyReader {

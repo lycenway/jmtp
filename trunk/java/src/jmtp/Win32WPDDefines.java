@@ -3,6 +3,14 @@ package jmtp;
 import be.derycke.pieter.com.Guid;
 
 public class Win32WPDDefines {
+	//TODO pla missing van header
+	static final Guid WPD_OBJECT_FORMAT_PLA = new Guid(0xBA050000, 0xAE6C, 0x4804, new short[]{0x98, 0xBA, 0xC5, 0x7B, 0x46, 0x96, 0x5F, 0xe7});
+	static final int PORTABLE_DEVICE_DELETE_NO_RECURSION  = 0;
+	static final int PORTABLE_DEVICE_DELETE_WITH_RECURSION  = 1;
+	
+	
+	
+	
 	static final Guid GUID_DEVINTERFACE_WPD = new Guid(0x6AC27878l, 0xA6FA, 0x4155, new short[]{0xBA, 0x85, 0xF9, 0x8F, 0x49, 0x1D, 0x4F, 0x33});
 	static final Guid GUID_DEVINTERFACE_WPD_PRIVATE = new Guid(0xBA0C718Fl, 0x4DED, 0x49B7, new short[]{0xBD, 0xD3, 0xFA, 0xBE, 0x28, 0x66, 0x12, 0x11});
 	static final String WPD_DEVICE_OBJECT_ID = "DEVICE";

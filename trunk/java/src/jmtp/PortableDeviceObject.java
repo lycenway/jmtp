@@ -21,6 +21,8 @@ package jmtp;
 
 import java.util.Date;
 
+import be.derycke.pieter.com.Guid;
+
 /**
  *
  * @author Pieter De Rycke
@@ -41,4 +43,9 @@ public interface PortableDeviceObject {
     public long getSize();
     public String getPersistentUniqueIdentifier();
     public String getSyncID();
+    public Guid getFormat();
+    
+    public void setSyncID(String value);	//TODO nog een exception kunnen gooien
+    
+    public void delete();
 }

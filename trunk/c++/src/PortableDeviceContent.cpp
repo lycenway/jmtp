@@ -26,7 +26,7 @@
 
 static inline IPortableDeviceContent* GetPortableDeviceContent(JNIEnv* env, jobject obj)
 {
-	return (IPortableDeviceContent*)GetComReference(env, obj, "pDeviceContent");
+	return (IPortableDeviceContent*)GetComReferencePointer(env, obj, "pDeviceContent");
 }
 
 JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectWithPropertiesAndData
@@ -114,6 +114,71 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectW
 	return NULL;
 }
 
+JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectWithPropertiesOnly
+	(JNIEnv* env, jobject obj, jobject jobjValues)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceContent* pDeviceContent;
+	IPortableDeviceValues* pValues;
+	LPWSTR wszObjectID;
+	jstring jsObjectID;
+
+	
+	//Methode implementatie
+	if(jobjValues != NULL)
+	{
+		pDeviceContent = GetPortableDeviceContent(env, obj);
+		pValues = (IPortableDeviceValues*)GetComReferencePointerFromComReferenceable(env, jobjValues);
+		hr = pDeviceContent->CreateObjectWithPropertiesOnly(pValues, &wszObjectID);
+
+		if(SUCCEEDED(hr))
+		{
+			jsObjectID = (jstring)env->NewString((jchar*)wszObjectID, wcslen(wszObjectID));
+			CoTaskMemFree(wszObjectID);
+			return jsObjectID;
+		}
+		else
+		{
+			ThrowCOMException(env, L"Couldn't create the file", hr);
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "values can't be null");
+		return NULL;
+	}
+}
+
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceContentImplWin32_delete
+	(JNIEnv* env, jobject obj, jint jiOptions, jobject jobjObjectIDs)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceContent* pDeviceContent;
+	IPortableDevicePropVariantCollection* pObjectIDs;
+	
+
+	//Methode implementatie
+	if(jiOptions == 0 || jiOptions == 1)
+	{
+		pDeviceContent = GetPortableDeviceContent(env, obj);
+		pObjectIDs = (IPortableDevicePropVariantCollection*)GetComReferencePointerFromComReferenceable(env, jobjObjectIDs);
+		hr = pDeviceContent->Delete(jiOptions, pObjectIDs, NULL);
+
+		if(FAILED(hr))
+		{
+			ThrowCOMException(env, L"Failed to delete the files", hr);
+			return;
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "The parameter options has an invalid value.");
+		return;
+	}
+}
+
 JNIEXPORT jobjectArray JNICALL Java_jmtp_PortableDeviceContentImplWin32_listChildObjects
 	(JNIEnv* env, jobject obj, jstring jsParentID)
 {
@@ -193,6 +258,51 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceContentImplWin32_getProperties
 	else
 	{
 		ThrowCOMException(env, L"Failed to retrieve the property object", hr);
+		return NULL;
+	}
+}
+
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceContentImplWin32_getObjectIDsFromPersistentUniqueIDs
+	(JNIEnv* env, jobject obj, jobject jobjPropVariantCollection)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceContent* pContent;
+	IPortableDevicePropVariantCollection* pPersistentUniqueIDs;
+	IPortableDevicePropVariantCollection* pObjectIDs;
+	jclass cls;
+	jmethodID mid;
+	jobject jobjReference;
+
+	//Methode implementatie
+	if(jobjPropVariantCollection != NULL)
+	{
+		pContent = GetPortableDeviceContent(env, obj);
+		pPersistentUniqueIDs =
+			(IPortableDevicePropVariantCollection*)GetComReferencePointerFromComReferenceable(env, jobjPropVariantCollection);
+
+		hr = pContent->GetObjectIDsFromPersistentUniqueIDs(pPersistentUniqueIDs, &pObjectIDs);
+
+		if(SUCCEEDED(hr))
+		{
+			//smart reference object aanmaken
+			cls = env->FindClass("be/derycke/pieter/com/COMReference");
+			mid = env->GetMethodID(cls, "<init>", "(J)V");
+			jobjReference = env->NewObject(cls, mid, pObjectIDs);
+			
+			cls = env->FindClass("jmtp/PortableDevicePropVariantCollectionImplWin32");
+			mid = env->GetMethodID(cls, "<init>", "(Lbe/derycke/pieter/com/COMReference;)V");
+			return env->NewObject(cls, mid, jobjReference);
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the ObjectIDs", hr);
+			return NULL;
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "persistentUniqueIDs can't be null");
 		return NULL;
 	}
 }

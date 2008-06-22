@@ -19,16 +19,13 @@
 
 package jmtp;
 
-import java.io.File;
-import java.io.IOException;
-
 import be.derycke.pieter.com.COMException;
 
 /**
  *
  * @author Pieter De Rycke
  */
-class PortableDeviceFolderObjectImplWin32 extends PortableDeviceObjectImplWin32 implements PortableDeviceFolderObject{
+class PortableDeviceFolderObjectImplWin32 extends AbstractPortableDeviceContainerImplWin32 implements PortableDeviceFolderObject{
 
     public PortableDeviceFolderObjectImplWin32(String objectID, PortableDeviceContentImplWin32 content,
             PortableDevicePropertiesImplWin32 properties) {
@@ -49,25 +46,17 @@ class PortableDeviceFolderObjectImplWin32 extends PortableDeviceObjectImplWin32 
             return new PortableDeviceObject[0];
         }
     }
-
-	public PortableDeviceAudioObject addAudioObject(File file,
-			String artist, String title) throws IOException {
-		
+    
+    public void delete(boolean recursive) {
 		try {
-			PortableDeviceValuesImplWin32 trackValues = new PortableDeviceValuesImplWin32();
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_PARENT_ID, this.objectID);
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_ORIGINAL_FILE_NAME, file.getName());
-			trackValues.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_MP3);	//TODO nog manier vinden om type te detecteren
-			trackValues.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_AUDIO);
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_NAME, title);
-			trackValues.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
-			
-	        return new PortableDeviceAudioObjectImplWin32(content.createObjectWithPropertiesAndData(trackValues, file),
-	        		this.content, this.properties);
+			PortableDevicePropVariantCollectionImplWin32 collection = 
+				new PortableDevicePropVariantCollectionImplWin32();
+			collection.add(new PropVariant(this.objectID));
+			this.content.delete(Win32WPDDefines.PORTABLE_DEVICE_DELETE_WITH_RECURSION, collection);
 		}
 		catch(COMException e) {
-			throw new IOException(e);
+			//TODO -> misschien een exception gooien?
+			e.printStackTrace();
 		}
-	}
-    
+    }
 }
