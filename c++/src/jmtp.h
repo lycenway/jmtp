@@ -35,5 +35,6 @@ jobject ConvertPropVariantToJava(JNIEnv* env, PROPVARIANT pv);
 PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant);
 
 jobject RetrieveCOMReferenceFromCOMReferenceable(JNIEnv* env, jobject jobjCOMReferenceable);
-jlong GetComReference(JNIEnv* env, jobject obj, const char* fieldName);
 jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference);
+jlong GetComReferencePointer(JNIEnv* env, jobject obj, const char* fieldName);
+jlong GetComReferencePointerFromComReferenceable(JNIEnv* env, jobject jobjCOMReferenceable);

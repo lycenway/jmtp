@@ -89,7 +89,6 @@ class WPDImplWin32 {
 			}
     		
     		Guid contentType = values.getGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE);
-    		System.out.println(contentType.toString());
 	    	
             if(contentType.equals(Win32WPDDefines.WPD_CONTENT_TYPE_FOLDER)) {
                 return new PortableDeviceFolderObjectImplWin32(objectID, content, properties);

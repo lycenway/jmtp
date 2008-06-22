@@ -25,7 +25,7 @@
 static inline IPortableDevicePropVariantCollection* GetPortableDevicePropVariantCollection
 	(JNIEnv* env, jobject obj)
 {
-	return (IPortableDevicePropVariantCollection*)GetComReference(env, obj, "pPropVariantCollection");
+	return (IPortableDevicePropVariantCollection*)GetComReferencePointer(env, obj, "pPropVariantCollection");
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDevicePropVariantCollectionImplWin32_add

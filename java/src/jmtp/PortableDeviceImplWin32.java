@@ -143,4 +143,41 @@ class PortableDeviceImplWin32 implements PortableDevice {
             return null;
         }
     }
+    
+    public PortableDeviceObject[] getPortableDeviceObjectsFromPersistentUniqueIDs(
+    		String[] persistentUniqueIDs) {
+    	
+    	try {
+	    	PortableDeviceContentImplWin32 content = getDeviceContent();
+            PortableDevicePropertiesImplWin32 properties = 
+                    content.getProperties();
+	    	
+	    	PortableDevicePropVariantCollectionImplWin32 persistentUniqueIDCollection = 
+	    		new PortableDevicePropVariantCollectionImplWin32();
+	    	for(String persistentUniqueID : persistentUniqueIDs)
+	    		persistentUniqueIDCollection.add(new PropVariant(persistentUniqueID));
+	    	
+	    	PortableDevicePropVariantCollectionImplWin32 objectIDCollection = 
+	    		getDeviceContent().getObjectIDsFromPersistentUniqueIDs(persistentUniqueIDCollection);
+	    	
+	    	PortableDeviceObject[] result = new PortableDeviceObject[(int)objectIDCollection.count()];
+	    	for(int i = 0; i < result.length; i++) {
+	    		result[i] = 
+	    			WPDImplWin32.convertToPortableDeviceObject((String)objectIDCollection.getAt(i).getValue(), 
+	    					content, properties);
+	    	}
+	    	
+	    	return result;
+    	}
+    	catch(COMException e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
+    public PortableDeviceObject getPortableDeviceObjectsFromPersistentUniqueIDs(
+    		String persistentUniqueID) {
+    	
+    	return getPortableDeviceObjectsFromPersistentUniqueIDs(new String[] {persistentUniqueID})[0];
+    }
 }

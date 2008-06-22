@@ -24,7 +24,7 @@
 
 static inline IPortableDeviceKeyCollection* GetPortableDeviceKeyCollection(JNIEnv* env, jobject obj)
 {
-	return (IPortableDeviceKeyCollection*)GetComReference(env, obj, "pKeyCollection");
+	return (IPortableDeviceKeyCollection*)GetComReferencePointer(env, obj, "pKeyCollection");
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceKeyCollectionImplWin32_add

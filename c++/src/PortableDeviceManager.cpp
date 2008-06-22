@@ -25,7 +25,7 @@
 
 static inline IPortableDeviceManager* GetPortableDeviceManager(JNIEnv* env, jobject obj)
 {
-	return (IPortableDeviceManager*)GetComReference(env, obj, "pDeviceManager");
+	return (IPortableDeviceManager*)GetComReferencePointer(env, obj, "pDeviceManager");
 }
 
 JNIEXPORT jobjectArray JNICALL Java_jmtp_PortableDeviceManagerImplWin32_getDevicesImpl

@@ -25,7 +25,7 @@
 
 inline IPortableDeviceProperties* GetPortableDeviceProperties(JNIEnv* env, jobject obj)
 {
-	return (IPortableDeviceProperties*)GetComReference(env, obj, "pDeviceProperties");
+	return (IPortableDeviceProperties*)GetComReferencePointer(env, obj, "pDeviceProperties");
 }
 
 JNIEXPORT jobject JNICALL Java_jmtp_PortableDevicePropertiesImplWin32_getPropertyAttributes
@@ -147,12 +147,12 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDevicePropertiesImplWin32_setValues
 		else
 		{
 			ThrowCOMException(env, L"Couldn't change the properties of the element", hr);
+			return NULL;
 		}
 	}
 	else
 	{
 		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "arguments can't be null");
+		return NULL;
 	}
-
-	return NULL;
 }

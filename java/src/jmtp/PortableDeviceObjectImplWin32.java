@@ -22,6 +22,7 @@ package jmtp;
 import java.util.Date;
 
 import be.derycke.pieter.com.COMException;
+import be.derycke.pieter.com.Guid;
 import be.derycke.pieter.com.OleDate;
 
 /**
@@ -67,7 +68,7 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
                     getStringValue(key);
         }
         catch(COMException e) {
-            return null;
+            return null;	//comexception -> de string werd niet ingesteld
         }
     }
     
@@ -76,14 +77,11 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     		values.clear();
     		values.setStringValue(key, value);
     		PortableDeviceValuesImplWin32 results = properties.setValues(objectID, values);
-    		COMException error = results.getErrorValue(key);
-    		if(error.equals(null)) { //TODO wanneer niet gevonden
-    			//-> iets misgegaan
-    		}
+    		if(results.count() > 0)
+    			throw new UnsupportedOperationException("Couldn't change the property.");
     	}
     	catch(COMException e) {
-    		//TODO mss beter een andere operatie
-    		throw new UnsupportedOperationException("Couldn't change the property");
+    		e.printStackTrace();
     	}
     }
     
@@ -117,6 +115,17 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     	}
     	catch(COMException e) {
     		return false;
+    	}
+    }
+    
+    protected Guid retrieveGuidValue(PropertyKey key) {
+    	try {
+    		keyCollection.clear();
+            keyCollection.add(key);
+            return properties.getValues(objectID, keyCollection).getGuidValue(key);
+    	}
+    	catch(COMException e) {
+    		return null;
     	}
     }
     
@@ -178,6 +187,28 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
 	
 	public String getSyncID() {
 		return retrieveStringValue(Win32WPDDefines.WPD_OBJECT_SYNC_ID);
+	}
+	
+	//TODO slechts tijdelijk de guids geven -> enum aanmaken
+	public Guid getFormat() {
+		return retrieveGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT);
+	}
+	
+	public void setSyncID(String value) {
+		changeStringValue(Win32WPDDefines.WPD_OBJECT_SYNC_ID, value);
+	}
+	
+	public void delete() {
+		try {
+			PortableDevicePropVariantCollectionImplWin32 collection = 
+				new PortableDevicePropVariantCollectionImplWin32();
+			collection.add(new PropVariant(this.objectID));
+			this.content.delete(Win32WPDDefines.PORTABLE_DEVICE_DELETE_NO_RECURSION, collection);
+		}
+		catch(COMException e) {
+			//TODO -> misschien een exception gooien?
+			e.printStackTrace();
+		}
 	}
     
     @Override

@@ -35,7 +35,7 @@ import java.util.Set;
 class PortableDeviceManagerImplWin32 implements PortableDeviceManagerProxy {
     
     static {
-        System.loadLibrary("jwpd");
+        System.loadLibrary("jmtp");
     }
     
     private COMReference pDeviceManager;

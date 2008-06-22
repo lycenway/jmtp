@@ -138,6 +138,7 @@ PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant)
 	jstring jsValue;
 	LPWSTR wszBuffer;
 	LPWSTR wszValue;
+	jobject jobjObjectValue;
 
 
 	//methode implementatie
@@ -147,15 +148,23 @@ PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant)
 	mid = env->GetMethodID(cls, "getVt", "()I");
 	pv.vt = env->CallIntMethod(jobjPropVariant, mid);
 
-	if(pv.vt == VT_LPWSTR)
+	switch(pv.vt)
 	{
-		mid = env->GetMethodID(cls, "getValue", "()Ljava/lang/Object;");
-		jsValue = (jstring)env->CallObjectMethod(jobjPropVariant, mid);
-		wszBuffer = (WCHAR*)env->GetStringChars(jsValue, NULL);
-		wszValue = (WCHAR*)CoTaskMemAlloc(sizeof(WCHAR) * (wcslen(wszBuffer) + 1));
-		wcscpy_s(wszValue, wcslen(wszBuffer) + 1, wszBuffer);
-		env->ReleaseStringChars(jsValue, (jchar*)wszBuffer);
-		pv.pwszVal = wszValue;
+		case VT_LPWSTR:
+			mid = env->GetMethodID(cls, "getValue", "()Ljava/lang/Object;");
+			jsValue = (jstring)env->CallObjectMethod(jobjPropVariant, mid);
+			wszBuffer = (WCHAR*)env->GetStringChars(jsValue, NULL);
+			wszValue = (WCHAR*)CoTaskMemAlloc(sizeof(WCHAR) * (wcslen(wszBuffer) + 1));
+			wcscpy_s(wszValue, wcslen(wszBuffer) + 1, wszBuffer);
+			env->ReleaseStringChars(jsValue, (jchar*)wszBuffer);
+			pv.pwszVal = wszValue;
+			break;
+		case VT_BOOL:
+			mid = env->GetMethodID(cls, "getValue", "()Ljava/lang/Object;");
+			jobjObjectValue = env->CallObjectMethod(jobjPropVariant, mid);
+			mid = env->GetMethodID(env->FindClass("java/lang/Boolean"), "booleanValue", "()Z");
+			pv.boolVal = env->CallBooleanMethod(jobjObjectValue, mid);
+			break;
 	}
 	//andere types worden momenteel niet ondersteunt
 	
@@ -171,20 +180,25 @@ inline jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference)
 }
 
 //De COMReference opvragen van een COMReferencable object
-jobject RetrieveCOMReferenceFromCOMReferenceable(JNIEnv* env, jobject jobjCOMReferenceable)
+inline jobject RetrieveCOMReferenceFromCOMReferenceable(JNIEnv* env, jobject jobjCOMReferenceable)
 {
 	jmethodID mid = env->GetMethodID(env->FindClass("be/derycke/pieter/com/COMReferenceable"), 
 		"getReference", "()Lbe/derycke/pieter/com/COMReference;");
 	return env->CallObjectMethod(jobjCOMReferenceable, mid);
 }
 
-jlong GetComReference(JNIEnv* env, jobject obj, const char* fieldName)
+jlong GetComReferencePointer(JNIEnv* env, jobject obj, const char* fieldName)
 {
 	jclass cls;
 	jobject reference;
-	jmethodID mid;
 
 	cls = env->GetObjectClass(obj);
 	reference = env->GetObjectField(obj, env->GetFieldID(cls, fieldName, "Lbe/derycke/pieter/com/COMReference;"));
 	return ConvertComReferenceToPointer(env, reference);
+}
+
+jlong GetComReferencePointerFromComReferenceable(JNIEnv* env, jobject jobjCOMReferenceable)
+{
+	jobject jobjReference = RetrieveCOMReferenceFromCOMReferenceable(env, jobjCOMReferenceable);
+	return ConvertComReferenceToPointer(env, jobjReference);
 }

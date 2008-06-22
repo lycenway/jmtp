@@ -24,7 +24,7 @@
 
 inline IPortableDeviceValues* GetPortableDeviceValues(JNIEnv* env, jobject obj)
 {
-	return (IPortableDeviceValues*)GetComReference(env, obj, "pDeviceValues");
+	return (IPortableDeviceValues*)GetComReferencePointer(env, obj, "pDeviceValues");
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_clear
@@ -42,6 +42,29 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_clear
 	if(FAILED(hr))
 	{
 		ThrowCOMException(env, L"Failed to clear the collection", hr);
+	}
+}
+
+JNIEXPORT jlong JNICALL Java_jmtp_PortableDeviceValuesImplWin32_count
+	(JNIEnv* env, jobject obj)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+	DWORD dwCount;
+
+
+	//methode implementatie
+	pValues = GetPortableDeviceValues(env, obj);
+	hr = pValues->GetCount(&dwCount);
+
+	if(SUCCEEDED(hr))
+	{
+		return dwCount;
+	}
+	else
+	{
+		ThrowCOMException(env, L"Failed to count the collection", hr);
 	}
 }
 
@@ -71,10 +94,20 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getStringValue
 	pValues = GetPortableDeviceValues(env, obj);
 
 	hr = pValues->GetStringValue(ConvertJavaToPropertyKey(env, key), &wszValue);
-	jsValue = env->NewString((jchar*)wszValue, wcslen(wszValue));
-	CoTaskMemFree(wszValue);
 
-	return jsValue;
+	if(SUCCEEDED(hr))
+	{
+		jsValue = env->NewString((jchar*)wszValue, wcslen(wszValue));
+		CoTaskMemFree(wszValue);
+		return jsValue;
+	}
+	else
+	{
+		ThrowCOMException(env, L"Failed to get the string value", hr);
+		return NULL;
+	}
+
+	
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setGuidValue
@@ -313,13 +346,28 @@ JNIEXPORT jthrowable JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getErrorVal
 	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
-
+	HRESULT error;
+	jclass cls;
+	jmethodID mid;
+	jstring jsMessage;
 
 	//methode implementatie
 	if(jobjKey != NULL)
 	{
 		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetErrorValue(ConvertJavaToPropertyKey(env, jobjKey), &error);
 
+		if(SUCCEEDED(hr))
+		{
+			cls = env->FindClass("be/derycke/pieter/com/COMException");
+			mid = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+			jsMessage = env->NewString((jchar*)L"The request is not supported.", 29);
+			return (jthrowable)env->NewObject(cls, mid, jsMessage, (jint)error);
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the error", hr);
+		}
 	}
 	else
 	{

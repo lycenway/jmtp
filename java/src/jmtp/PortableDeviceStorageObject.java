@@ -19,6 +19,14 @@
 
 package jmtp;
 
+import java.io.File;
+import java.io.IOException;
+
 public interface PortableDeviceStorageObject extends PortableDeviceFunctionalObject {
 	public PortableDeviceObject[] getChildObjects();
+	public PortableDeviceAudioObject addAudioObject(File bestand, 
+    		String artist, String title) throws IOException;
+    public PortableDevicePlaylistObject createPlaylistObject(String name,
+    		PortableDeviceObject[] references);
+	public PortableDeviceFolderObject createFolderObject(String name);
 }

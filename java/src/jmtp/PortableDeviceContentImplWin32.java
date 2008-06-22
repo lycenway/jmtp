@@ -51,9 +51,14 @@ class PortableDeviceContentImplWin32 {
     native String createObjectWithPropertiesOnly(PortableDeviceValuesImplWin32 values) 
             throws COMException;
     
+    native void delete(int options, PortableDevicePropVariantCollectionImplWin32 objectIDs);
+    
     native String[] listChildObjects(String parentID) throws COMException;
     
     native PortableDevicePropertiesImplWin32 getProperties() throws COMException;
+    
+    native PortableDevicePropVariantCollectionImplWin32 getObjectIDsFromPersistentUniqueIDs(
+    		PortableDevicePropVariantCollectionImplWin32 persistentUniqueIDs) throws COMException;
     
     /**
      * The Cancel method cancels a pending operation called on this interface

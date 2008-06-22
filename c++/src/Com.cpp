@@ -51,7 +51,7 @@ JNIEXPORT jobject JNICALL Java_be_derycke_pieter_com_COM_CoCreateInstance
 
 	//niet 100% want een dword is een unsigned long een een jlong een signed long
 	//maar doet het voor nu wel
-	hr = CoCreateInstance(rclsid, (LPUNKNOWN)pUnkOuter, dwClsContext, riid, &reference);
+	hr = CoCreateInstance(rclsid, (LPUNKNOWN)pUnkOuter, (DWORD)dwClsContext, riid, &reference);
 
 	if(SUCCEEDED(hr))
 	{

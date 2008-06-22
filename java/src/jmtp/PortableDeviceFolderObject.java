@@ -31,4 +31,8 @@ public interface PortableDeviceFolderObject extends PortableDeviceObject {
     public PortableDeviceObject[] getChildObjects();
     public PortableDeviceAudioObject addAudioObject(File bestand, 
     		String artist, String title) throws IOException;
+    public PortableDevicePlaylistObject createPlaylistObject(String name,
+    		PortableDeviceObject[] references);
+    public PortableDeviceFolderObject createFolderObject(String name);
+    public void delete(boolean recursive);
 }
