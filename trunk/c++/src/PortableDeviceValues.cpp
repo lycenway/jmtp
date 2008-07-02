@@ -65,6 +65,7 @@ JNIEXPORT jlong JNICALL Java_jmtp_PortableDeviceValuesImplWin32_count
 	else
 	{
 		ThrowCOMException(env, L"Failed to count the collection", hr);
+		return -1;
 	}
 }
 
@@ -106,8 +107,6 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getStringValue
 		ThrowCOMException(env, L"Failed to get the string value", hr);
 		return NULL;
 	}
-
-	
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setGuidValue
@@ -160,53 +159,61 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getGuidValue
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedIntegerValue
 	(JNIEnv* env, jobject obj, jobject key, jlong value)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 
-	pValues = GetPortableDeviceValues(env, obj);
-
-	if(key == NULL)
+	
+	//methode implementatie
+	if(key != NULL)
+	{
+		if(key >= 0)
+		{
+			pValues = GetPortableDeviceValues(env, obj);
+			hr = pValues->SetUnsignedIntegerValue(ConvertJavaToPropertyKey(env, key), static_cast<ULONG>(value));
+			if(FAILED(hr))
+			{
+				ThrowCOMException(env, L"Failed to set the integer value", hr);
+			}
+		}
+		else
+		{
+			env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "The integer must be possitive");
+		}
+	}
+	else
 	{
 		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "PropertyKey can't be null");
-		return;
-	}
-	if(key < 0)
-	{
-		env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "The integer must be possitive");
-		return;
-	}
-
-	hr = pValues->SetUnsignedIntegerValue(ConvertJavaToPropertyKey(env, key), value);
-	if(FAILED(hr))
-	{
-		ThrowCOMException(env, L"Failed to set the integer value", hr);
-		return;
 	}
 }
 
 JNIEXPORT jlong JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getUnsignedIntegerValue
 	(JNIEnv* env, jobject obj, jobject key)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 	ULONG value;
 
-	pValues = GetPortableDeviceValues(env, obj);
 
-	if(key == NULL)
+	//methode implementatie
+	if(key != NULL)
+	{
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetUnsignedIntegerValue(ConvertJavaToPropertyKey(env, key), &value);
+		if(SUCCEEDED(hr))
+			return value;
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the integer value", hr);
+			return -1;
+		}
+	}
+	else
 	{
 		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "PropertyKey can't be null");
 		return -1;
 	}
-
-	hr = pValues->GetUnsignedIntegerValue(ConvertJavaToPropertyKey(env, key), &value);
-	if(FAILED(hr))
-	{
-		ThrowCOMException(env, L"Failed to retrieve the integer value", hr);
-		return -1;
-	}
-	else
-		return value;
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setPortableDeviceValuesCollectionValue
@@ -310,6 +317,26 @@ JNIEXPORT jboolean JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getBoolValue
 	return NULL;
 }
 
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setFloateValue
+	(JNIEnv* env, jobject obj, jobject jobjKey, jfloat jfValue)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+
+
+	//methode implementatie
+	if(jobjKey != NULL)
+	{
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->SetFloatValue(ConvertJavaToPropertyKey(env, jobjKey), jfValue);
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+	}
+}
+
 JNIEXPORT jfloat JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getFloatValue
 	(JNIEnv* env, jobject obj, jobject jobjKey)
 {
@@ -351,6 +378,7 @@ JNIEXPORT jthrowable JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getErrorVal
 	jmethodID mid;
 	jstring jsMessage;
 
+
 	//methode implementatie
 	if(jobjKey != NULL)
 	{
@@ -367,12 +395,47 @@ JNIEXPORT jthrowable JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getErrorVal
 		else
 		{
 			ThrowCOMException(env, L"Failed to retrieve the error", hr);
+			return NULL;
 		}
 	}
 	else
 	{
 		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+		return NULL;
 	}
+}
 
-	return NULL;
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedLargeIntegerValue
+	(JNIEnv* env, jobject obj, jobject jobjKey, jobject jobjValue)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+	ULONGLONG value;
+
+
+	//methode implementatie
+	if(jobjKey != NULL)
+	{
+		if(jobjValue != NULL)
+		{
+			pValues = GetPortableDeviceValues(env, obj);
+			value = ConvertJavaToUnsignedLongLong(env, jobjValue);
+			hr = pValues->SetUnsignedLargeIntegerValue(ConvertJavaToPropertyKey(env, jobjKey), value);
+
+			if(FAILED(hr))
+			{
+				ThrowCOMException(env, L"Failed to set the unsigned large integer value.", hr);
+			}
+		}
+		else
+		{
+			env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "value can't be null");
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+		return;
+	}
 }

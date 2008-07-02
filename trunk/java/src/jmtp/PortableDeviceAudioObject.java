@@ -33,4 +33,7 @@ public interface PortableDeviceAudioObject extends PortableDeviceObject {
     public String getGenre();
     public long getDuraction();
     public Date getReleaseDate();
+    
+    public void setAlbum(String value);
+    public void setGenre(String value);
 }

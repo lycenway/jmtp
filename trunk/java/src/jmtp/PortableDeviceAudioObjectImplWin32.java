@@ -58,4 +58,12 @@ class PortableDeviceAudioObjectImplWin32 extends PortableDeviceObjectImplWin32 i
 	public Date getReleaseDate() {
 		return retrieveDateValue(Win32WPDDefines.WPD_MEDIA_RELEASE_DATE);
 	}
+	
+	public void setAlbum(String value) {
+		changeStringValue(Win32WPDDefines.WPD_MUSIC_ALBUM, value);
+	}
+	
+	public void setGenre(String value) {
+		changeStringValue(Win32WPDDefines.WPD_MEDIA_GENRE, value);
+	}
 }

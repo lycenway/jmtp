@@ -101,7 +101,7 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceKeyCollectionImplWin32_getAt
 
 	if(jlPosition < dwCount && jlPosition >= 0)
 	{
-		hr = pKeyCollection->GetAt(jlPosition, &key);
+		hr = pKeyCollection->GetAt(static_cast<DWORD>(jlPosition), &key);
 		if(FAILED(hr))
 		{
 			ThrowCOMException(env, L"Failed to retrieve the specified element of the collection", hr);
@@ -134,7 +134,7 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceKeyCollectionImplWin32_removeAt
 
 	if(jlPosition < dwCount && jlPosition >= 0)
 	{
-		hr = pKeyCollection->RemoveAt(jlPosition);
+		hr = pKeyCollection->RemoveAt(static_cast<DWORD>(jlPosition));
 		if(FAILED(hr))
 		{
 			ThrowCOMException(env, L"Failed to remove the specified element from the collection", hr);

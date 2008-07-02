@@ -64,18 +64,18 @@ GUID ConvertJavaToGuid(JNIEnv* env, jobject jGuid)
 	cls = env->GetObjectClass(jGuid);
 
 	mid	= env->GetMethodID(cls, "getData1", "()J");
-	guid.Data1 = env->CallLongMethod(jGuid, mid);
+	guid.Data1 = static_cast<unsigned long>(env->CallLongMethod(jGuid, mid));
 
 	mid = env->GetMethodID(cls, "getData2", "()I");
-	guid.Data2 = env->CallIntMethod(jGuid, mid);
+	guid.Data2 = static_cast<unsigned short>(env->CallIntMethod(jGuid, mid));
 
 	mid = env->GetMethodID(cls, "getData3", "()I");
-	guid.Data3 = env->CallIntMethod(jGuid, mid);
+	guid.Data3 = static_cast<unsigned short>(env->CallIntMethod(jGuid, mid));
 
 	mid = env->GetMethodID(cls, "getData4", "()[S");
 	jshort* data4 = env->GetShortArrayElements((jshortArray)env->CallObjectMethod(jGuid, mid), NULL);
 	for(int i = 0; i < 8; i++)
-		guid.Data4[i] = data4[i];
+		guid.Data4[i] = static_cast<unsigned char>(data4[i]);
 
 	return guid;
 }
@@ -101,7 +101,7 @@ PROPERTYKEY ConvertJavaToPropertyKey(JNIEnv* env, jobject jKey)
 	cls = env->FindClass("jmtp/PropertyKey");
 
 	mid = env->GetMethodID(cls, "getPid", "()J");
-	key.pid = env->CallLongMethod(jKey, mid);
+	key.pid = static_cast<DWORD>(env->CallLongMethod(jKey, mid));
 
 	mid = env->GetMethodID(cls, "getFmtid", "()Lbe/derycke/pieter/com/Guid;");
 	jGuid = env->CallObjectMethod(jKey, mid);
@@ -146,7 +146,7 @@ PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant)
 	cls = env->FindClass("jmtp/PropVariant");
 	
 	mid = env->GetMethodID(cls, "getVt", "()I");
-	pv.vt = env->CallIntMethod(jobjPropVariant, mid);
+	pv.vt = static_cast<VARTYPE>(env->CallIntMethod(jobjPropVariant, mid));
 
 	switch(pv.vt)
 	{
@@ -169,6 +169,49 @@ PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant)
 	//andere types worden momenteel niet ondersteunt
 	
 	return pv;
+}
+
+ULONGLONG ConvertJavaToUnsignedLongLong(JNIEnv* env, jobject jobjBigInteger)
+{
+	jmethodID mid;
+	jbyteArray jbaArray;
+	jboolean isCopy = JNI_TRUE;
+	jbyte* buffer;
+	jsize jiLength;
+	ULONGLONG result = 0;
+	byte* tmp;
+
+	mid = env->GetMethodID(env->FindClass("java/math/BigInteger"), "signum", "()I");
+	if(env->CallIntMethod(jobjBigInteger, mid) >= 0)
+	{
+		mid = env->GetMethodID(env->FindClass("java/math/BigInteger"), "toByteArray", "()[B");
+		jbaArray = (jbyteArray)env->CallObjectMethod(jobjBigInteger, mid);
+
+		//van big endian naar little endian converteren
+		jiLength = env->GetArrayLength(jbaArray);
+		buffer = env->GetByteArrayElements(jbaArray, &isCopy);
+
+		//i < 8 is omdat we met een 64 bit getal werken
+		tmp = new byte[sizeof(ULONGLONG)];
+		for(int i = 0; i < sizeof(ULONGLONG); i++)
+		{
+			if(i < jiLength)
+				tmp[i] = buffer[jiLength - i - 1];
+			else
+				tmp[i] = 0;
+		}
+		memcpy_s(&result, sizeof(ULONGLONG), tmp, sizeof(ULONGLONG));
+		delete tmp;
+
+		env->ReleaseByteArrayElements(jbaArray, buffer, JNI_ABORT);
+
+		return result;
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "Only positive integers can be converted.");
+		return -1;	//-> wat doen we bij negatieve getallen?
+	}
 }
 
 inline jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference)

@@ -141,6 +141,7 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectW
 		else
 		{
 			ThrowCOMException(env, L"Couldn't create the file", hr);
+			return NULL;
 		}
 	}
 	else
