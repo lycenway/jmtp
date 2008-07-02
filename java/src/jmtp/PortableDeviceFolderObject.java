@@ -21,6 +21,8 @@ package jmtp;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Date;
 
 /**
  *
@@ -30,7 +32,10 @@ public interface PortableDeviceFolderObject extends PortableDeviceObject {
     
     public PortableDeviceObject[] getChildObjects();
     public PortableDeviceAudioObject addAudioObject(File bestand, 
-    		String artist, String title) throws IOException;
+    		String artist, String title, BigInteger duration) throws IOException;
+    public PortableDeviceAudioObject addAudioObject(File file,
+			String artist, String title, BigInteger duration, 
+			String genre, String album, Date releaseDate) throws IOException;
     public PortableDevicePlaylistObject createPlaylistObject(String name,
     		PortableDeviceObject[] references);
     public PortableDeviceFolderObject createFolderObject(String name);

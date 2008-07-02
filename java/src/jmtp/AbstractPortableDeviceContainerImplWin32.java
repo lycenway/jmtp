@@ -21,8 +21,11 @@ package jmtp;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Date;
 
 import be.derycke.pieter.com.COMException;
+import be.derycke.pieter.com.OleDate;
 
 //gemeenschappelijke klasse voor storage en folder
 abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceObjectImplWin32 {
@@ -75,11 +78,13 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_PLA);
 			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_PLAYLIST);
 			
-			PortableDevicePropVariantCollectionImplWin32 propVariantCollection =
-				new PortableDevicePropVariantCollectionImplWin32();
-			for(PortableDeviceObject reference : references)
-				propVariantCollection.add(new PropVariant(reference.getID()));
-			values.setPortableDeviceValuesCollectionValue(Win32WPDDefines.WPD_OBJECT_REFERENCES, propVariantCollection);
+			if(references != null) {
+				PortableDevicePropVariantCollectionImplWin32 propVariantCollection =
+					new PortableDevicePropVariantCollectionImplWin32();
+				for(PortableDeviceObject reference : references)
+					propVariantCollection.add(new PropVariant(reference.getID()));
+				values.setPortableDeviceValuesCollectionValue(Win32WPDDefines.WPD_OBJECT_REFERENCES, propVariantCollection);
+			}
 			
 			return new PortableDevicePlaylistObjectImplWin32(content.createObjectWithPropertiesOnly(values),
 	        		this.content, this.properties);
@@ -90,20 +95,56 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 		}
 	}
 	
+	private PortableDeviceAudioObject addAudioObject(File file, 
+			PortableDeviceValuesImplWin32 values) throws IOException {
+	
+		try {
+			values.setStringValue(Win32WPDDefines.WPD_OBJECT_PARENT_ID, this.objectID);
+			values.setStringValue(Win32WPDDefines.WPD_OBJECT_ORIGINAL_FILE_NAME, file.getName());
+			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_MP3);	//TODO nog manier vinden om type te detecteren
+			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_AUDIO);
+			
+			return new PortableDeviceAudioObjectImplWin32(content.createObjectWithPropertiesAndData(values, file),
+	        		this.content, this.properties);
+		}
+		catch(COMException e) {
+			throw new IOException(e);
+		}
+	}
+	
 	public PortableDeviceAudioObject addAudioObject(File file,
-			String artist, String title) throws IOException {
+			String artist, String title, BigInteger duration) throws IOException {
 		
 		try {
 			PortableDeviceValuesImplWin32 trackValues = new PortableDeviceValuesImplWin32();
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_PARENT_ID, this.objectID);
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_ORIGINAL_FILE_NAME, file.getName());
-			trackValues.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_MP3);	//TODO nog manier vinden om type te detecteren
-			trackValues.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_AUDIO);
 			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_NAME, title);
 			trackValues.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
+			trackValues.setUnsignedLargeIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, duration);
 			
-	        return new PortableDeviceAudioObjectImplWin32(content.createObjectWithPropertiesAndData(trackValues, file),
-	        		this.content, this.properties);
+	        return addAudioObject(file, trackValues);
+		}
+		catch(COMException e) {
+			throw new IOException(e);
+		}
+	}
+	
+	public PortableDeviceAudioObject addAudioObject(File file,
+			String artist, String title, BigInteger duration, 
+			String genre, String album, Date releaseDate) throws IOException {
+		
+		try {
+			PortableDeviceValuesImplWin32 values = new PortableDeviceValuesImplWin32();
+			values.setStringValue(Win32WPDDefines.WPD_OBJECT_NAME, title);
+			values.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
+			values.setUnsignedLargeIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, duration);
+			if(genre != null)
+				values.setStringValue(Win32WPDDefines.WPD_MEDIA_GENRE, genre);
+			if(album != null)
+				values.setStringValue(Win32WPDDefines.WPD_MUSIC_ALBUM, album);
+			if(releaseDate != null)
+				values.setFloateValue(Win32WPDDefines.WPD_MEDIA_RELEASE_DATE, (float)new OleDate(releaseDate).toDouble());
+			
+	        return addAudioObject(file, values);
 		}
 		catch(COMException e) {
 			throw new IOException(e);

@@ -19,6 +19,8 @@
 
 package jmtp;
 
+import java.math.BigInteger;
+
 import be.derycke.pieter.com.COM;
 import be.derycke.pieter.com.COMException;
 import be.derycke.pieter.com.COMReference;
@@ -71,4 +73,6 @@ class PortableDeviceValuesImplWin32 implements COMReferenceable {
     
     public native void setErrorValue(PropertyKey key, COMException error) throws COMException;
     public native COMException getErrorValue(PropertyKey key) throws COMException;
+    
+    public native void setUnsignedLargeIntegerValue(PropertyKey key, BigInteger value) throws COMException;
 }
