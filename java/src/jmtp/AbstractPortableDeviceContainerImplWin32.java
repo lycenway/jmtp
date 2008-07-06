@@ -130,7 +130,7 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 	
 	public PortableDeviceAudioObject addAudioObject(File file,
 			String artist, String title, BigInteger duration, 
-			String genre, String album, Date releaseDate) throws IOException {
+			String genre, String album, Date releaseDate, int track) throws IOException {
 		
 		try {
 			PortableDeviceValuesImplWin32 values = new PortableDeviceValuesImplWin32();
@@ -143,6 +143,8 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 				values.setStringValue(Win32WPDDefines.WPD_MUSIC_ALBUM, album);
 			if(releaseDate != null)
 				values.setFloateValue(Win32WPDDefines.WPD_MEDIA_RELEASE_DATE, (float)new OleDate(releaseDate).toDouble());
+			if(track >= 0)
+				values.setUnsignedIntegerValue(Win32WPDDefines.WPD_MUSIC_TRACK, track);
 			
 	        return addAudioObject(file, values);
 		}

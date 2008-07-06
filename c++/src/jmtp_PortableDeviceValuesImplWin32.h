@@ -162,6 +162,14 @@ JNIEXPORT jthrowable JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getErrorVal
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedLargeIntegerValue
   (JNIEnv *, jobject, jobject, jobject);
 
+/*
+ * Class:     jmtp_PortableDeviceValuesImplWin32
+ * Method:    getUnsignedLargeIntegerValue
+ * Signature: (Ljmtp/PropertyKey;)Ljava/math/BigInteger;
+ */
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getUnsignedLargeIntegerValue
+  (JNIEnv *, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif

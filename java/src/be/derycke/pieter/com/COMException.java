@@ -5,6 +5,24 @@ package be.derycke.pieter.com;
  * @author Pieter De Rycke
  */
 public class COMException extends Exception {
+	
+	/*
+	 * Common HRESULT Values:
+	 * The following HRESULT values are the most common.
+	 * More values are contained in the header file Winerror.h.
+	 */
+	public static final long S_OK = 0x00000000L; //Operation successful
+	public static final long E_ABORT = 0x80004004L; //Operation aborted
+	public static final long E_ACCESSDENIED = 0x80070005L; //General access denied error
+	public static final long E_FAIL = 0x80004005L; //Unspecified failure
+	public static final long E_HANDLE = 0x80070006L; //Handle that is not valid
+	public static final long E_INVALIDARG = 0x80070057L; //One or more arguments are not valid
+	public static final long E_NOINTERFACE = 0x80004002L; //No such interface supported
+	public static final long E_NOTIMPL = 0x80004001L; //Not implemented
+	public static final long E_OUTOFMEMORY = 0x8007000EL; //Failed to allocate necessary memory
+	public static final long E_POINTER = 0x80004003L; //Pointer that is not valid
+	public static final long E_UNEXPECTED = 0x8000FFFFL; //Unexpected failure
+	
 	/*
 	#define FACILITY_AAF               18  \\ 00000010010
 	#define FACILITY_ACS               20  \\ 00000010100

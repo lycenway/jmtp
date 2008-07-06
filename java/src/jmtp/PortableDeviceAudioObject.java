@@ -19,6 +19,7 @@
 
 package jmtp;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -31,9 +32,17 @@ public interface PortableDeviceAudioObject extends PortableDeviceObject {
     public String getAlbumArtist();
     public String getAlbum();
     public String getGenre();
-    public long getDuraction();
+    public BigInteger getDuraction();
     public Date getReleaseDate();
+    public int getTrackNumber();
+    public long getUseCount();
     
+    public void setTitle(String value);
+    public void setArtist(String value);
+    public void setAlbumArtist(String value);
     public void setAlbum(String value);
     public void setGenre(String value);
+    public void setDuration(BigInteger value);
+    public void setTrackNumber(int value);
+    public void setUseCount(long value);
 }

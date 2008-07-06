@@ -19,6 +19,7 @@
 
 package jmtp;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import be.derycke.pieter.com.COMException;
@@ -68,7 +69,14 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
                     getStringValue(key);
         }
         catch(COMException e) {
-            return null;	//comexception -> de string werd niet ingesteld
+        	if(e.getHresult() == Win32WPDDefines.ERROR_NOT_FOUND)
+        		return null;
+        	else if(e.getHresult() == Win32WPDDefines.ERROR_NOT_SUPPORTED)
+        		throw new UnsupportedOperationException("Couldn't retrieve the specified property.");
+        	else {
+	        	e.printStackTrace();
+	            return null;	//comexception -> de string werd niet ingesteld
+        	}
         }
     }
     
@@ -77,8 +85,10 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     		values.clear();
     		values.setStringValue(key, value);
     		PortableDeviceValuesImplWin32 results = properties.setValues(objectID, values);
-    		if(results.count() > 0)
+    		if(results.count() > 0 
+    				&& results.getErrorValue(key).getHresult() != COMException.S_OK) {
     			throw new UnsupportedOperationException("Couldn't change the property.");
+    		}
     	}
     	catch(COMException e) {
     		e.printStackTrace();
@@ -92,8 +102,30 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
             return properties.getValues(objectID, keyCollection).getUnsignedIntegerValue(key);
         }
         catch(COMException e) {
-            return -1;
+        	if(e.getHresult() == Win32WPDDefines.ERROR_NOT_FOUND)
+        		return -1;
+        	else if(e.getHresult() == Win32WPDDefines.ERROR_NOT_SUPPORTED)
+        		throw new UnsupportedOperationException("Couldn't retrieve the specified property.");
+        	else {
+        		e.printStackTrace();
+        		return -1;
+        	}
         }
+    }
+    
+    protected void changeLongValue(PropertyKey key, long value) {
+    	try {
+    		values.clear();
+    		values.setUnsignedIntegerValue(key, value);
+    		PortableDeviceValuesImplWin32 results = properties.setValues(objectID, values);
+    		if(results.count() > 0 
+    				&& results.getErrorValue(key).getHresult() != COMException.S_OK) {
+    			throw new UnsupportedOperationException("Couldn't change the property.");
+    		}
+    	}
+    	catch(COMException e) {
+    		e.printStackTrace();
+    	}
     }
     
     protected Date retrieveDateValue(PropertyKey key) {
@@ -126,6 +158,40 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     	}
     	catch(COMException e) {
     		return null;
+    	}
+    }
+    
+    protected BigInteger retrieveBigIntegerValue(PropertyKey key) {
+    	try {
+            keyCollection.clear();
+            keyCollection.add(key);
+            return properties.getValues(objectID, keyCollection).
+                    getUnsignedLargeIntegerValue(key);
+        }
+        catch(COMException e) {
+        	if(e.getHresult() == Win32WPDDefines.ERROR_NOT_FOUND)
+        		return new BigInteger("-1");
+        	else if(e.getHresult() == Win32WPDDefines.ERROR_NOT_SUPPORTED)
+        		throw new UnsupportedOperationException("Couldn't retrieve the specified property.");
+        	else {
+	        	e.printStackTrace();
+	            return null;	//comexception -> de string werd niet ingesteld
+        	}
+        }
+    }
+    
+    protected void changeBigIntegerValue(PropertyKey key, BigInteger value) {
+    	try {
+    		values.clear();
+    		values.setUnsignedLargeIntegerValue(key, value);
+    		PortableDeviceValuesImplWin32 results = properties.setValues(objectID, values);
+    		if(results.count() > 0 
+    				&& results.getErrorValue(key).getHresult() != COMException.S_OK) {
+    			throw new UnsupportedOperationException("Couldn't change the property.");
+    		}
+    	}
+    	catch(COMException e) {
+    		e.printStackTrace();
     	}
     }
     
@@ -173,8 +239,8 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     		return null;
     }
 
-    public long getSize() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public BigInteger getSize() {
+        return retrieveBigIntegerValue(Win32WPDDefines.WPD_OBJECT_SIZE);
     }
 
     public String getPersistentUniqueIdentifier() {

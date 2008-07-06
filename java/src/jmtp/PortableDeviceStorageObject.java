@@ -30,8 +30,18 @@ public interface PortableDeviceStorageObject extends PortableDeviceFunctionalObj
 			String artist, String title, BigInteger duration) throws IOException;
     public PortableDeviceAudioObject addAudioObject(File file,
 			String artist, String title, BigInteger duration, 
-			String genre, String album, Date releaseDate) throws IOException;
+			String genre, String album, Date releaseDate, int track) throws IOException;
     public PortableDevicePlaylistObject createPlaylistObject(String name,
     		PortableDeviceObject[] references);
 	public PortableDeviceFolderObject createFolderObject(String name);
+	
+	public String getFileSystemType();
+	public String getDescription();
+	public String getSerialNumber();
+	public BigInteger getCapacity();
+	public BigInteger getCapacityInObjects();
+	public BigInteger getFreeSpace();
+	public BigInteger getFreeSpaceInObjects();
+	public BigInteger getMaximumObjectSize();
+	public StorageType getType();
 }

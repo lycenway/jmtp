@@ -75,4 +75,5 @@ class PortableDeviceValuesImplWin32 implements COMReferenceable {
     public native COMException getErrorValue(PropertyKey key) throws COMException;
     
     public native void setUnsignedLargeIntegerValue(PropertyKey key, BigInteger value) throws COMException;
+    public native BigInteger getUnsignedLargeIntegerValue(PropertyKey key) throws COMException;
 }
