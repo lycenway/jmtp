@@ -35,6 +35,7 @@ jobject ConvertPropVariantToJava(JNIEnv* env, PROPVARIANT pv);
 PROPVARIANT ConvertJavaToPropVariant(JNIEnv* env, jobject jobjPropVariant);
 
 ULONGLONG ConvertJavaToUnsignedLongLong(JNIEnv* env, jobject jobjBigInteger);
+jobject ConvertUnsignedLongLongToJava(JNIEnv* env, ULONGLONG number);
 
 jobject RetrieveCOMReferenceFromCOMReferenceable(JNIEnv* env, jobject jobjCOMReferenceable);
 jlong ConvertComReferenceToPointer(JNIEnv* env, jobject jobjReference);

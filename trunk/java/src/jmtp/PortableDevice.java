@@ -34,4 +34,13 @@ public interface PortableDevice {
     public PortableDeviceObject[] getRootObjects();
     public PortableDeviceObject[] getPortableDeviceObjectsFromPersistentUniqueIDs(String[] persistentUniqueIDs);
     public PortableDeviceObject getPortableDeviceObjectsFromPersistentUniqueIDs(String persistentUniqueID);
+    public String getSerialNumber();
+    public String getFirmwareVersion();
+    public String getModel();
+    public String getProtocol();
+    public String getSyncPartner();
+    public int getPowerLevel();
+    public PortableDeviceType getType();
+    public PowerSource getPowerSource();
+    public boolean isNonConsumableSupported();
 }

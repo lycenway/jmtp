@@ -19,6 +19,7 @@
 
 package jmtp;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 
@@ -46,9 +47,8 @@ class PortableDeviceAudioObjectImplWin32 extends PortableDeviceObjectImplWin32 i
 		return retrieveStringValue(Win32WPDDefines.WPD_MEDIA_GENRE);
 	}
 
-	public long getDuraction() {
-		// TODO Auto-generated method stub
-		return 0;
+	public BigInteger getDuraction() {
+		return retrieveBigIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION);
 	}
 
 	public String getTitle() {
@@ -59,11 +59,44 @@ class PortableDeviceAudioObjectImplWin32 extends PortableDeviceObjectImplWin32 i
 		return retrieveDateValue(Win32WPDDefines.WPD_MEDIA_RELEASE_DATE);
 	}
 	
+	public int getTrackNumber() {
+		//in normal cases an int should be fine for the track number
+		return (int)retrieveLongValue(Win32WPDDefines.WPD_MUSIC_TRACK);
+	}
+	
+	public long getUseCount() {
+		return retrieveLongValue(Win32WPDDefines.WPD_MEDIA_USE_COUNT);
+	}
+	
+	public void setTitle(String value) {
+		changeStringValue(Win32WPDDefines.WPD_OBJECT_NAME, value);
+	}
+	
+	public void setArtist(String value) {
+		changeStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, value);
+	}
+	
+    public void setAlbumArtist(String value) {
+    	changeStringValue(Win32WPDDefines.WPD_MEDIA_ALBUM_ARTIST, value);
+    }
+	
 	public void setAlbum(String value) {
 		changeStringValue(Win32WPDDefines.WPD_MUSIC_ALBUM, value);
 	}
 	
 	public void setGenre(String value) {
 		changeStringValue(Win32WPDDefines.WPD_MEDIA_GENRE, value);
+	}
+	
+	public void setDuration(BigInteger value) {
+		changeBigIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, value);
+	}
+	
+	public void setTrackNumber(int value) {
+		changeLongValue(Win32WPDDefines.WPD_MUSIC_TRACK, value);
+	}
+	
+	public void setUseCount(long value) {
+		changeLongValue(Win32WPDDefines.WPD_MEDIA_USE_COUNT, value);
 	}
 }

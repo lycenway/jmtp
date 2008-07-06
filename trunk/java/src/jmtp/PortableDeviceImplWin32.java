@@ -35,6 +35,10 @@ class PortableDeviceImplWin32 implements PortableDevice {
     @SuppressWarnings("unused")
 	private COMReference pDevice;
     
+    private PortableDeviceContentImplWin32 content;
+    private PortableDevicePropertiesImplWin32 properties;
+    private PortableDeviceKeyCollectionImplWin32 keyCollection;
+    
     PortableDeviceImplWin32(COMReference pDeviceManager, String deviceID) {
         this.pDeviceManager = pDeviceManager;
         this.deviceID = deviceID;
@@ -60,6 +64,73 @@ class PortableDeviceImplWin32 implements PortableDevice {
     /*
      * In Java geïmplementeerde methoden
      */
+    private void createStructures() throws COMException {
+    	if(content == null)
+    		content = getDeviceContent();
+    	
+    	if(properties == null)
+            properties = content.getProperties();
+    	
+    	if(keyCollection == null)
+    		keyCollection = new PortableDeviceKeyCollectionImplWin32();
+    	else		
+    		keyCollection.clear();
+    }
+    
+    private String retrieveStringValue(PropertyKey key) throws COMException {
+    	try {
+    		createStructures();
+	    	
+	        keyCollection.add(key);
+	        return properties.getValues(Win32WPDDefines.WPD_DEVICE_OBJECT_ID, keyCollection).
+	        	getStringValue(key);
+    	}
+    	catch(COMException e) {
+    		if(e.getHresult() == COMException.E_POINTER) {
+    			//there is no connection to the device
+    			throw new DeviceClosedException("The device connection is closed.");
+    		}
+    		else {
+	    		throw e;
+    		}
+    	}
+    }
+    
+    private long retrieveUnsignedIntegerValue(PropertyKey key) throws COMException {
+    	try {
+    		createStructures();
+	    	
+	        keyCollection.add(key);
+	        return properties.getValues(Win32WPDDefines.WPD_DEVICE_OBJECT_ID, keyCollection).
+	        	getUnsignedIntegerValue(key);
+    	}
+    	catch(COMException e) {
+    		if(e.getHresult() == COMException.E_POINTER) {
+    			//there is no connection to the device
+    			throw new DeviceClosedException("The device connection is closed.");
+    		}
+    		else {
+	    		throw e;
+    		}
+    	}
+    }
+    
+    private boolean retrieveBooleanValue(PropertyKey key) throws COMException {
+    	try {
+    		createStructures();
+	    	
+	        keyCollection.add(key);
+	        return properties.getValues(Win32WPDDefines.WPD_DEVICE_OBJECT_ID, keyCollection).
+	        	getBoolValue(key);
+    	}
+    	catch(COMException e) {
+    		if(e.getHresult() == COMException.E_POINTER)
+    			throw new DeviceClosedException("The device connection is closed.");
+    		else
+	    		throw e;
+    	}
+    }
+    
     public String getFriendlyName() {
         try {
             return getDeviceFriendlyName(deviceID);
@@ -107,7 +178,12 @@ class PortableDeviceImplWin32 implements PortableDevice {
             openImpl(new PortableDeviceValuesImplWin32());
         }
         catch(COMException e) {
-            e.printStackTrace();
+        	if(e.getHresult() == Win32WPDDefines.E_WPD_DEVICE_ALREADY_OPENED) {
+        		throw new DeviceAlreadyOpenedException("The device connection has already been opened.");
+        	}
+        	else {
+        		e.printStackTrace();
+        	}
         }
     }
     
@@ -139,8 +215,14 @@ class PortableDeviceImplWin32 implements PortableDevice {
             return objects;
         }
         catch (COMException e) {
-            e.printStackTrace();
-            return null;
+        	if(e.getHresult() == COMException.E_POINTER) {
+    			//there is no connection to the device
+    			throw new DeviceClosedException("The device connection is closed.");
+    		}
+    		else {
+	    		e.printStackTrace();
+	    		return null;
+    		}
         }
     }
     
@@ -170,8 +252,14 @@ class PortableDeviceImplWin32 implements PortableDevice {
 	    	return result;
     	}
     	catch(COMException e) {
-    		e.printStackTrace();
-    		return null;
+    		if(e.getHresult() == COMException.E_POINTER) {
+    			//there is no connection to the device
+    			throw new DeviceClosedException("The device connection is closed.");
+    		}
+    		else {
+	    		e.printStackTrace();
+	    		return null;
+    		}
     	}
     }
     
@@ -179,5 +267,113 @@ class PortableDeviceImplWin32 implements PortableDevice {
     		String persistentUniqueID) {
     	
     	return getPortableDeviceObjectsFromPersistentUniqueIDs(new String[] {persistentUniqueID})[0];
+    }
+    
+    public String getSerialNumber() {
+    	try {
+    		return retrieveStringValue(Win32WPDDefines.WPD_DEVICE_SERIAL_NUMBER);
+    	}
+    	catch(COMException e) {
+	    	return null;
+    	}
+    }
+    
+    public String getFirmwareVersion() {
+    	try {
+    		return retrieveStringValue(Win32WPDDefines.WPD_DEVICE_FIRMWARE_VERSION);
+    	}
+    	catch(COMException e) {
+	    	return null;
+    	}
+    }
+    
+    public String getModel() {
+    	try {
+    		return retrieveStringValue(Win32WPDDefines.WPD_DEVICE_MODEL);
+    	}
+    	catch(COMException e) {
+	    	return null;
+    	}
+    }
+    
+    public String getProtocol() {
+    	try {
+    		return retrieveStringValue(Win32WPDDefines.WPD_DEVICE_PROTOCOL);
+    	}
+    	catch(COMException e) {
+	    	return null;
+    	}
+    }
+    
+    public String getSyncPartner() {
+    	try {
+    		return retrieveStringValue(Win32WPDDefines.WPD_DEVICE_SYNC_PARTNER);
+    	}
+    	catch(COMException e) {
+	    	return null;
+    	}
+    }
+    
+    public int getPowerLevel() {
+    	try {
+    		//we can cast to an int because only values in the range [0-100]
+    		return (int)retrieveUnsignedIntegerValue(Win32WPDDefines.WPD_DEVICE_POWER_LEVEL);
+    	}
+    	catch(COMException e) {
+	    	return -1;
+    	}
+    }
+    
+    public PortableDeviceType getType() {
+    	try {
+    		return PortableDeviceType.values()[(int)retrieveUnsignedIntegerValue(Win32WPDDefines.WPD_DEVICE_TYPE)];
+    	}
+    	catch(COMException e) {
+	    	return PortableDeviceType.GENERIC;
+    	}
+    }
+    
+    public PowerSource getPowerSource() {
+        try {
+        	return PowerSource.values()[(int)retrieveUnsignedIntegerValue(Win32WPDDefines.WPD_DEVICE_POWER_SOURCE)];
+        }
+        catch(COMException e) {
+    	    return PowerSource.BATTERY;
+        }
+    }
+    
+    public boolean isNonConsumableSupported() {
+    	try {
+    		return retrieveBooleanValue(Win32WPDDefines.WPD_DEVICE_SUPPORTS_NON_CONSUMABLE);
+    	}
+    	catch(COMException e) {
+    		return false;
+    	}
+    }
+    
+    public static void main(String[] args) {
+    	String id = "{00276159-0000-0000-0000-000000000000}";
+    	
+    	PortableDeviceManager manager = new PortableDeviceManager();
+    	PortableDevice device = manager.getDevices()[0];
+    	device.open();
+    	PortableDeviceAudioObject o = (PortableDeviceAudioObject)device.getPortableDeviceObjectsFromPersistentUniqueIDs(id);
+    	System.out.println("Original File Name: " + o.getOriginalFileName());
+    	System.out.println("Duration: " + o.getDuraction());
+    	System.out.println("Size: " + o.getSize());
+    	System.out.println("Track Number: " + o.getTrackNumber());
+    	System.out.println("Duration: " + o.getDuraction());
+    	System.out.println("Use Count: " + o.getUseCount());
+    	
+    	/*
+    	PortableDeviceStorageObject storage = (PortableDeviceStorageObject)device.getRootObjects()[0];
+    	System.out.println("File System Type: " + storage.getFileSystemType());
+    	System.out.println("Description: " + storage.getDescription());
+    	System.out.println("Serial Number: " + storage.getSerialNumber());
+    	System.out.println("Capacity: " + storage.getCapacity());
+    	System.out.println("Free Space : " + storage.getFreeSpace());
+    	System.out.println("Type : " + storage.getType());
+    	*/
+    	device.close();
     }
 }

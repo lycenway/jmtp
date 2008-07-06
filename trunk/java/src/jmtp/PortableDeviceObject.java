@@ -19,6 +19,7 @@
 
 package jmtp;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import be.derycke.pieter.com.Guid;
@@ -40,7 +41,7 @@ public interface PortableDeviceObject {
     public Date getDateCreated();
     public Date getDateAuthored();
     public PortableDeviceObject getParent();
-    public long getSize();
+    public BigInteger getSize();
     public String getPersistentUniqueIdentifier();
     public String getSyncID();
     public Guid getFormat();

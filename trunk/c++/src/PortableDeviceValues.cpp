@@ -92,6 +92,7 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getStringValue
 	LPWSTR wszValue;
 	jstring jsValue;
 
+
 	pValues = GetPortableDeviceValues(env, obj);
 
 	hr = pValues->GetStringValue(ConvertJavaToPropertyKey(env, key), &wszValue);
@@ -167,7 +168,7 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedIntege
 	//methode implementatie
 	if(key != NULL)
 	{
-		if(key >= 0)
+		if(value >= 0)
 		{
 			pValues = GetPortableDeviceValues(env, obj);
 			hr = pValues->SetUnsignedIntegerValue(ConvertJavaToPropertyKey(env, key), static_cast<ULONG>(value));
@@ -438,4 +439,34 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedLargeI
 		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
 		return;
 	}
+}
+
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getUnsignedLargeIntegerValue
+	(JNIEnv* env, jobject obj, jobject jobjKey)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+	ULONGLONG value;
+
+	//methode implementatie
+	if(jobjKey != NULL)
+	{
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetUnsignedLargeIntegerValue(ConvertJavaToPropertyKey(env, jobjKey), &value);
+		if(SUCCEEDED(hr))
+		{
+			return ConvertUnsignedLongLongToJava(env, value);
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the unsigned large integer value.", hr);
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+	}
+
+	return NULL;
 }
