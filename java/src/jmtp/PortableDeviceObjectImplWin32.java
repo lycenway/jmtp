@@ -139,6 +139,19 @@ class PortableDeviceObjectImplWin32 implements PortableDeviceObject {
     	}
     }
     
+    protected void changeDateValue(PropertyKey key, Date value) {
+    	try {
+            values.clear();
+    		values.setFloateValue(key, (float)new OleDate(value).toDouble());
+    		PortableDeviceValuesImplWin32 results = properties.setValues(objectID, values);
+    		if(results.count() > 0 
+    				&& results.getErrorValue(key).getHresult() != COMException.S_OK) {
+    			throw new UnsupportedOperationException("Couldn't change the property.");
+    		}
+    	}
+    	catch(COMException e) {}
+    }
+    
     protected boolean retrieveBooleanValue(PropertyKey key) {
     	try {
     		keyCollection.clear();
