@@ -92,6 +92,10 @@ class PortableDeviceAudioObjectImplWin32 extends PortableDeviceObjectImplWin32 i
 		changeBigIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, value);
 	}
 	
+	public void setReleaseDate(Date value) {
+		changeDateValue(Win32WPDDefines.WPD_MEDIA_RELEASE_DATE, value);
+	}
+	
 	public void setTrackNumber(int value) {
 		changeLongValue(Win32WPDDefines.WPD_MUSIC_TRACK, value);
 	}

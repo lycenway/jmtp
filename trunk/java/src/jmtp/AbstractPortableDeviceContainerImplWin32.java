@@ -20,6 +20,7 @@
 package jmtp;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
@@ -95,47 +96,25 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 		}
 	}
 	
-	private PortableDeviceAudioObject addAudioObject(File file, 
-			PortableDeviceValuesImplWin32 values) throws IOException {
-	
-		try {
-			values.setStringValue(Win32WPDDefines.WPD_OBJECT_PARENT_ID, this.objectID);
-			values.setStringValue(Win32WPDDefines.WPD_OBJECT_ORIGINAL_FILE_NAME, file.getName());
-			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_MP3);	//TODO nog manier vinden om type te detecteren
-			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_AUDIO);
-			
-			return new PortableDeviceAudioObjectImplWin32(content.createObjectWithPropertiesAndData(values, file),
-	        		this.content, this.properties);
-		}
-		catch(COMException e) {
-			throw new IOException(e);
-		}
-	}
-	
 	public PortableDeviceAudioObject addAudioObject(File file,
-			String artist, String title, BigInteger duration) throws IOException {
+			String artist, String title, BigInteger duration) throws FileNotFoundException, IOException {
 		
-		try {
-			PortableDeviceValuesImplWin32 trackValues = new PortableDeviceValuesImplWin32();
-			trackValues.setStringValue(Win32WPDDefines.WPD_OBJECT_NAME, title);
-			trackValues.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
-			trackValues.setUnsignedLargeIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, duration);
-			
-	        return addAudioObject(file, trackValues);
-		}
-		catch(COMException e) {
-			throw new IOException(e);
-		}
+		return addAudioObject(file, artist, title, duration, null, null, null, -1);
 	}
 	
 	public PortableDeviceAudioObject addAudioObject(File file,
 			String artist, String title, BigInteger duration, 
-			String genre, String album, Date releaseDate, int track) throws IOException {
+			String genre, String album, Date releaseDate, int track) throws FileNotFoundException, IOException {
 		
 		try {
 			PortableDeviceValuesImplWin32 values = new PortableDeviceValuesImplWin32();
+			values.setStringValue(Win32WPDDefines.WPD_OBJECT_PARENT_ID, this.objectID);
+			values.setStringValue(Win32WPDDefines.WPD_OBJECT_ORIGINAL_FILE_NAME, file.getName());
+			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_FORMAT, Win32WPDDefines.WPD_OBJECT_FORMAT_MP3);	//TODO nog manier vinden om type te detecteren
+			values.setGuidValue(Win32WPDDefines.WPD_OBJECT_CONTENT_TYPE, Win32WPDDefines.WPD_CONTENT_TYPE_AUDIO);
 			values.setStringValue(Win32WPDDefines.WPD_OBJECT_NAME, title);
-			values.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
+			if(artist != null)
+				values.setStringValue(Win32WPDDefines.WPD_MEDIA_ARTIST, artist);
 			values.setUnsignedLargeIntegerValue(Win32WPDDefines.WPD_MEDIA_DURATION, duration);
 			if(genre != null)
 				values.setStringValue(Win32WPDDefines.WPD_MEDIA_GENRE, genre);
@@ -146,10 +125,15 @@ abstract class AbstractPortableDeviceContainerImplWin32 extends PortableDeviceOb
 			if(track >= 0)
 				values.setUnsignedIntegerValue(Win32WPDDefines.WPD_MUSIC_TRACK, track);
 			
-	        return addAudioObject(file, values);
+	        return new PortableDeviceAudioObjectImplWin32(content.createObjectWithPropertiesAndData(values, file),
+	        		this.content, this.properties);
 		}
 		catch(COMException e) {
-			throw new IOException(e);
+			if(e.getHresult() == Win32WPDDefines.E_FILENOTFOUND)
+				throw new FileNotFoundException("File " + file + " was not found.");
+			else {
+				throw new IOException(e);
+			}
 		}
 	}
 }

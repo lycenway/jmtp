@@ -19,6 +19,8 @@
 
 package jmtp;
 
+import java.util.Date;
+
 import be.derycke.pieter.com.COM;
 import be.derycke.pieter.com.COMException;
 import be.derycke.pieter.com.COMReference;
@@ -353,10 +355,28 @@ class PortableDeviceImplWin32 implements PortableDevice {
     
     public static void main(String[] args) {
     	String id = "{00276159-0000-0000-0000-000000000000}";
+    	String wmp_id = "{00128F26-0000-0000-0000-000000000000}";
+    	
     	
     	PortableDeviceManager manager = new PortableDeviceManager();
     	PortableDevice device = manager.getDevices()[0];
     	device.open();
+    	/*
+    	PortableDeviceStorageObject storage = (PortableDeviceStorageObject)device.getRootObjects()[0];
+    	PortableDeviceObject o = storage.getChildObjects()[5];
+    	o = ((PortableDeviceFolderObject)o).getChildObjects()[10];
+    	o = ((PortableDeviceFolderObject)o).getChildObjects()[0];
+    	o = ((PortableDeviceFolderObject)o).getChildObjects()[0];
+    	System.out.println(o.getOriginalFileName());
+    	System.out.println(o.getPersistentUniqueIdentifier());
+    	System.out.println();
+    	
+    	Date datum = ((PortableDeviceAudioObject)o).getReleaseDate();
+    	((PortableDeviceAudioObject)o).setReleaseDate(datum);
+    	System.out.println(((PortableDeviceAudioObject)o).getReleaseDate());
+    	*/
+    	
+    	
     	PortableDeviceAudioObject o = (PortableDeviceAudioObject)device.getPortableDeviceObjectsFromPersistentUniqueIDs(id);
     	System.out.println("Original File Name: " + o.getOriginalFileName());
     	System.out.println("Duration: " + o.getDuraction());
@@ -364,6 +384,13 @@ class PortableDeviceImplWin32 implements PortableDevice {
     	System.out.println("Track Number: " + o.getTrackNumber());
     	System.out.println("Duration: " + o.getDuraction());
     	System.out.println("Use Count: " + o.getUseCount());
+    	
+    	
+    	//Date datum = Calendar.getInstance().getTime();
+    	Date datum = o.getReleaseDate();
+    	System.out.println(datum);
+    	o.setReleaseDate(datum);
+    	System.out.println("Release Date: " + o.getReleaseDate());
     	
     	/*
     	PortableDeviceStorageObject storage = (PortableDeviceStorageObject)device.getRootObjects()[0];

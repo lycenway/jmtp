@@ -63,13 +63,13 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceContentImplWin32_createObjectW
 	hr = SHCreateStreamOnFileW(wszFileLocation, STGM_READ, &pFileStream);
 	env->ReleaseStringChars(jsFileLocation, (jchar*)wszFileLocation); //string resources terug vrijgeven
 
-	//groote van het bestand bepalen
-	//(door een beperking in java op het gebied van unsigned integers, moeten we het wel in c++ doen)
-	pFileStream->Stat(&fileStats, STATFLAG_NONAME);
-	pDeviceObjectValues->SetUnsignedLargeIntegerValue(WPD_OBJECT_SIZE, fileStats.cbSize.QuadPart);
-
 	if(SUCCEEDED(hr))
 	{
+		//groote van het bestand bepalen
+		//(door een beperking in java op het gebied van unsigned integers, moeten we het wel in c++ doen)
+		pFileStream->Stat(&fileStats, STATFLAG_NONAME);
+		pDeviceObjectValues->SetUnsignedLargeIntegerValue(WPD_OBJECT_SIZE, fileStats.cbSize.QuadPart);
+
 		hr = pDeviceContent->CreateObjectWithPropertiesAndData(pDeviceObjectValues, 
 			&pDeviceStream, &dwBufferSize, NULL);
 		

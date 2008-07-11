@@ -43,6 +43,7 @@ public interface PortableDeviceAudioObject extends PortableDeviceObject {
     public void setAlbum(String value);
     public void setGenre(String value);
     public void setDuration(BigInteger value);
+    public void setReleaseDate(Date value);
     public void setTrackNumber(int value);
     public void setUseCount(long value);
 }

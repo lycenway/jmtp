@@ -72,40 +72,68 @@ JNIEXPORT jlong JNICALL Java_jmtp_PortableDeviceValuesImplWin32_count
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setStringValue
 	(JNIEnv* env, jobject obj, jobject key, jstring value)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 	LPWSTR wszValue;
 
-	pValues = GetPortableDeviceValues(env, obj);
-	wszValue = (WCHAR*)env->GetStringChars(value, NULL);
-	
-	hr = pValues->SetStringValue(ConvertJavaToPropertyKey(env, key), wszValue);
 
-	env->ReleaseStringChars(value, (jchar*)wszValue);
+	//methode implementatie
+	if(key != NULL)
+	{
+		if(value != NULL)
+		{
+			pValues = GetPortableDeviceValues(env, obj);
+			wszValue = (WCHAR*)env->GetStringChars(value, NULL);
+			hr = pValues->SetStringValue(ConvertJavaToPropertyKey(env, key), wszValue);
+			env->ReleaseStringChars(value, (jchar*)wszValue);
+			if(FAILED(hr))
+			{
+				ThrowCOMException(env, L"Failed to set the string value", hr);
+			}
+		}
+		else
+		{
+			env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "value can't be null.");
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null.");
+	}
 }
 
 JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getStringValue
 	(JNIEnv* env, jobject obj, jobject key)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 	LPWSTR wszValue;
 	jstring jsValue;
 
 
-	pValues = GetPortableDeviceValues(env, obj);
-
-	hr = pValues->GetStringValue(ConvertJavaToPropertyKey(env, key), &wszValue);
-
-	if(SUCCEEDED(hr))
+	//methode implementatie
+	if(key != NULL)
 	{
-		jsValue = env->NewString((jchar*)wszValue, wcslen(wszValue));
-		CoTaskMemFree(wszValue);
-		return jsValue;
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetStringValue(ConvertJavaToPropertyKey(env, key), &wszValue);
+
+		if(SUCCEEDED(hr))
+		{
+			jsValue = env->NewString((jchar*)wszValue, wcslen(wszValue));
+			CoTaskMemFree(wszValue);
+			return jsValue;
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to get the string value", hr);
+			return NULL;
+		}
 	}
 	else
 	{
-		ThrowCOMException(env, L"Failed to get the string value", hr);
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null.");
 		return NULL;
 	}
 }
@@ -113,48 +141,66 @@ JNIEXPORT jstring JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getStringValue
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setGuidValue
 	(JNIEnv* env, jobject obj, jobject key, jobject guid)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 
-	pValues = GetPortableDeviceValues(env, obj);
 
-	if(guid == NULL || key == NULL)
+	//methode implementatie
+	if(key != NULL)
 	{
-		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "Parameters can't be \"null\"");
-		return;
+		if(guid != NULL)
+		{
+			pValues = GetPortableDeviceValues(env, obj);
+			hr = pValues->SetGuidValue(ConvertJavaToPropertyKey(env, key), ConvertJavaToGuid(env, guid));
+
+			if(FAILED(hr))
+			{
+				ThrowCOMException(env, L"Failed to set the Guid value", hr);
+				return;
+			}
+		}
+		else
+		{
+			env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "guid can't be null.");
+		}
 	}
-
-	hr = pValues->SetGuidValue(ConvertJavaToPropertyKey(env, key), ConvertJavaToGuid(env, guid));
-	if(FAILED(hr))
+	else
 	{
-		ThrowCOMException(env, L"Failed to set the Guid value", hr);
-		return;
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null.");
 	}
 }
 
 JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getGuidValue
 	(JNIEnv* env, jobject obj, jobject jobjKey)
 {
+	//variabelen
 	HRESULT hr;
 	IPortableDeviceValues* pValues;
 	GUID guid;
 
-	pValues = GetPortableDeviceValues(env, obj);
 
-	if(jobjKey == NULL)
+	//methode implementatie
+	if(jobjKey != NULL)
 	{
-		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "PropertyKey can't be null");
-		return NULL;
-	}
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetGuidValue(ConvertJavaToPropertyKey(env, jobjKey), &guid);
 
-	hr = pValues->GetGuidValue(ConvertJavaToPropertyKey(env, jobjKey), &guid);
-	if(FAILED(hr))
-	{
-		ThrowCOMException(env, L"Failed to retrieve the Guid value", hr);
-		return NULL;
+		if(SUCCEEDED(hr))
+		{
+			return ConvertGuidToJava(env, guid);
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the Guid value", hr);
+			return NULL;
+		}		
 	}
 	else
-		return ConvertGuidToJava(env, guid);
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null.");
+		return NULL;
+	}
 }
 
 JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedIntegerValue

@@ -22,14 +22,14 @@
 
 package be.derycke.pieter.com;
 
+import java.util.Calendar;
 import java.util.Date;
 
 @SuppressWarnings({"unused", "deprecation"})
 public class OleDate extends Date {
 	
 	public OleDate(Date date) {
-		super(date.getYear(), date.getMonth(), date.getDate(), 
-				date.getHours(), date.getMinutes());
+		super(date.getTime());
 	}
 	
     public OleDate(double date)
@@ -151,8 +151,13 @@ public class OleDate extends Date {
           ++n4Day;
 
           // Month number always >= n/32, so save some loop time */ 
+          /*
           for (tm_mon = (int)((n4Day >> 5) + 1);
              n4Day > rgMonthDays[tm_mon]; tm_mon++);
+             */
+          
+          for (tm_mon = (int)((n4Day % 5) + 1); 
+          	n4Day > rgMonthDays[tm_mon]; tm_mon++);
 
           tm_mday = (int)(n4Day - rgMonthDays[tm_mon-1]);
        }
@@ -184,45 +189,46 @@ public class OleDate extends Date {
 
 	public double toDouble()
     {
-       // source code copied from MFC 4.21 and modified.
+		// source code copied from MFC 4.21 and modified.
 
-       int wYear = getYear() + 1900;
-       int wMonth = getMonth() + 1;
-       int wDay = getDate();
-       int wHour = getHours();
-       int wMinute = getMinutes();
-       int wSecond = getSeconds();
+        int wYear = getYear() + 1900;
+        int wMonth = getMonth() + 1;
+        int wDay = getDate();
+        int wHour = getHours();
+        int wMinute = getMinutes();
+        int wSecond = getSeconds();
 
-       //  Check for leap year and set the number of days in the month
-       boolean bLeapYear = ((wYear & 3) == 0) &&
-          ((wYear % 100) != 0 || (wYear % 400) == 0);
+        //  Check for leap year and set the number of days in the month
+        boolean bLeapYear = ((wYear & 3) == 0) &&
+           ((wYear % 100) != 0 || (wYear % 400) == 0);
 
-       int nDaysInMonth =
-          rgMonthDays[wMonth] - rgMonthDays[wMonth-1] +
-          ((bLeapYear && wDay == 29 && wMonth == 2) ? 1 : 0);
+        int nDaysInMonth =
+           rgMonthDays[wMonth] - rgMonthDays[wMonth-1] +
+           ((bLeapYear && wDay == 29 && wMonth == 2) ? 1 : 0);
 
-       // Cache the date in days and time in fractional days
-       long nDate;
-       double dblTime;
+        // Cache the date in days and time in fractional days
+        long nDate;
+        double dblTime;
 
-       //It is a valid date; make Jan 1, 1AD be 1
-       nDate = wYear*365L + wYear/4 - wYear/100 + wYear/400 +
-          rgMonthDays[wMonth-1] + wDay;
+        //It is a valid date; make Jan 1, 1AD be 1
+        nDate = wYear*365L + wYear/4 - wYear/100 + wYear/400 +
+           rgMonthDays[wMonth-1] + wDay;
 
-       //  If leap year and it's before March, subtract 1:
-       if (wMonth >= 2 && bLeapYear)
-          --nDate;
+        //  If leap year and it's before March, subtract 1:
+        if (wMonth >= 2 && bLeapYear)
+           --nDate;
 
-       //  Offset so that 12/30/1899 is 0
-       nDate -= 693959L;
+        //  Offset so that 12/30/1899 is 0
+        nDate -= 693959L;
 
-       dblTime = (((long)wHour * 3600L) +  // hrs in seconds
-          ((long)wMinute * 60L) +  // mins in seconds
-          ((long)wSecond)) / 86400.;
+        dblTime = (((long)wHour * 3600L) +  // hrs in seconds
+           ((long)wMinute * 60L) +  // mins in seconds
+           ((long)wSecond)) / 86400.;
 
-       double dtDest = (double) nDate +
-          ((nDate >= 0) ? dblTime : -dblTime);
+        double dtDest = (double) nDate +
+           ((nDate >= 0) ? dblTime : -dblTime);
 
-       return dtDest;
+        return dtDest;
+
     }
 }
