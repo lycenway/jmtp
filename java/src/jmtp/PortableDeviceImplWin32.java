@@ -355,7 +355,8 @@ class PortableDeviceImplWin32 implements PortableDevice {
     
     public static void main(String[] args) {
     	String id = "{00276159-0000-0000-0000-000000000000}";
-    	String wmp_id = "{00128F26-0000-0000-0000-000000000000}";
+    	@SuppressWarnings("unused")
+		String wmp_id = "{00128F26-0000-0000-0000-000000000000}";
     	
     	
     	PortableDeviceManager manager = new PortableDeviceManager();

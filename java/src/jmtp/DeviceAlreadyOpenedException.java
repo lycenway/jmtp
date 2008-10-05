@@ -21,6 +21,8 @@ package jmtp;
 
 public class DeviceAlreadyOpenedException extends RuntimeException {
 	
+	private static final long serialVersionUID = -4077760815693830673L;
+
 	public DeviceAlreadyOpenedException(String message) {
 		super(message);
 	}
