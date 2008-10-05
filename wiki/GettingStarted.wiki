@@ -35,3 +35,5 @@ If(object instanceof PortableDeviceStorageObject) {
 }}}
 
 You can then retrieve the childobjects of the storage with the method getChildObjects(), child’s can be all kind of objects (folders, audio, unspecified objets, …) you can always use the instanceof to check the exact type of an object on the device.
+
+If you encounter a problem or a bug: don't be afraid you may always contact me on: phd[]ryc[]ke’at’gm][ail’dot’com (remove all the [ and ] and change ‘at’ to @ and ‘dot’ to .)
