@@ -21,6 +21,8 @@ package jmtp;
 
 public class DeviceClosedException extends RuntimeException {
 	
+	private static final long serialVersionUID = 2616903941432533067L;
+
 	public DeviceClosedException(String message) {
 		super(message);
 	}

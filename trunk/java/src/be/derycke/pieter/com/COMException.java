@@ -4,6 +4,7 @@ package be.derycke.pieter.com;
  *
  * @author Pieter De Rycke
  */
+@SuppressWarnings("serial")
 public class COMException extends Exception {
 	
 	/*
