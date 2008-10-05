@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary A quickstart guide for programmers
 
 = Getting Started with jMTP =
 The first thing you need to do, is create a new PortableDeviceManager object to handle all the connected media players.  You can then iterate over all the devices:
