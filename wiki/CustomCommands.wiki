@@ -2,11 +2,11 @@
 
 = Introduction =
 
-The Windows Portable Device API's allows sending custom commands directly to the driver. JMTP supports this functionality since beta 2. This advanced functionality is(currently) only supported on Windows.  
+The Windows Portable Device API's allows sending custom commands directly to the driver. JMTP supports this functionality since beta 2. This advanced functionality is (currently) only supported on Windows.  
 
 = Details =
 
-To be able to send custom commands, the PortableDevice object must be cast to an PortableDeviceImplWin32 object. Then sendCommand method can be used. This method accepts a PropertyKey value and returns a PortableDeviceValuesImpl32 which are Java implementations of interfaces found in the Windows SDK (for more information about these classes, please read the information provided in the Windows SDK).
+To be able to send custom commands, the PortableDevice object must be cast to an PortableDeviceImplWin32 object. Then sendCommand method can be used. This method accepts a PropertyKey value and returns a PortableDeviceValuesImpl32 which are Java implementations of interfaces found in the Windows SDK (for more information about these classes, please read the information provided in the Windows SDK). The COMExceptions thrown are wrapped HRESULT status codes.
 
 All the GUID’s and PropertyKey’s found in “PortableDeviceApi.h”, are defined in the java class jmtp.Win32WPDDefines. This allows easy use of all this values.
 
