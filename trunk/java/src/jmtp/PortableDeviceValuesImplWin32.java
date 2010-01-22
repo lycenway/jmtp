@@ -31,7 +31,7 @@ import be.derycke.pieter.com.Guid;
  *
  * @author Pieter De Rycke
  */
-class PortableDeviceValuesImplWin32 implements COMReferenceable {
+public class PortableDeviceValuesImplWin32 implements COMReferenceable {
     
     private COMReference pDeviceValues;
     
@@ -76,4 +76,7 @@ class PortableDeviceValuesImplWin32 implements COMReferenceable {
     
     public native void setUnsignedLargeIntegerValue(PropertyKey key, BigInteger value) throws COMException;
     public native BigInteger getUnsignedLargeIntegerValue(PropertyKey key) throws COMException;
+    
+    public native void setBufferValue(PropertyKey key, byte[] value) throws COMException;
+    public native byte[] getBufferValue(PropertyKey key) throws COMException;
 }

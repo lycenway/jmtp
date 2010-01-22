@@ -179,7 +179,6 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getGuidValue
 	IPortableDeviceValues* pValues;
 	GUID guid;
 
-
 	//methode implementatie
 	if(jobjKey != NULL)
 	{
@@ -460,7 +459,6 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedLargeI
 	IPortableDeviceValues* pValues;
 	ULONGLONG value;
 
-
 	//methode implementatie
 	if(jobjKey != NULL)
 	{
@@ -507,6 +505,86 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getUnsignedLar
 		else
 		{
 			ThrowCOMException(env, L"Failed to retrieve the unsigned large integer value.", hr);
+		}
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+	}
+
+	return NULL;
+}
+
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setBufferValue
+  (JNIEnv* env, jobject obj, jobject jobjKey, jbyteArray jobjValue)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+	jboolean isCopy;
+	jsize size;
+	jbyte* buffer;
+
+	//methode implementatie
+	if(jobjKey != NULL)
+	{
+		if(jobjValue != NULL)
+		{
+			pValues = GetPortableDeviceValues(env, obj);
+			size = env->GetArrayLength(jobjValue);
+			buffer = env->GetByteArrayElements(jobjValue, &isCopy);
+			hr = pValues->SetBufferValue(ConvertJavaToPropertyKey(env, jobjKey), (BYTE*)buffer, size);
+			env->ReleaseByteArrayElements(jobjValue, buffer, JNI_ABORT);	//release java array buffer without copying changes back to java
+
+			if(FAILED(hr))
+			{
+				ThrowCOMException(env, L"Failed to set the buffer value.", hr);
+			}
+		}
+		else
+		{
+			env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "value can't be null");
+		}
+
+	}
+	else
+	{
+		env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "key can't be null");
+		return;
+	}
+}
+
+JNIEXPORT jbyteArray JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getBufferValue
+  (JNIEnv* env, jobject obj, jobject jobjKey)
+{
+	//variabelen
+	HRESULT hr;
+	IPortableDeviceValues* pValues;
+	DWORD size;
+	jbyteArray value;
+	BYTE* buffer;
+	jbyte* jbuffer;
+
+	//methode implementatie
+	if(jobjKey != NULL)
+	{
+		pValues = GetPortableDeviceValues(env, obj);
+		hr = pValues->GetBufferValue(ConvertJavaToPropertyKey(env, jobjKey), (BYTE**) &buffer, &size);
+		if(SUCCEEDED(hr))
+		{
+			value = env->NewByteArray(size);
+			jbuffer = env->GetByteArrayElements(value, NULL);
+			memcpy(jbuffer, buffer, size);
+
+			//release resources
+			env->ReleaseByteArrayElements(value, jbuffer, 0);	//copy back the content to the JVM and free the buffer 
+			CoTaskMemFree(buffer);
+
+			return value;
+		}
+		else
+		{
+			ThrowCOMException(env, L"Failed to retrieve the buffer value.", hr);
 		}
 	}
 	else
