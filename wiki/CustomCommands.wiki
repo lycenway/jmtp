@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The Windows Portable Device API's allows sending custom commands directly to the driver. JMTP supports this functionality since beta 2. This is advanced functionality will (currently) only be supported on Windows.  
+The Windows Portable Device API's allows sending custom commands directly to the driver. JMTP supports this functionality since beta 2. This advanced functionality is(currently) only supported on Windows.  
 
 = Details =
 
