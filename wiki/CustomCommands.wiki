@@ -39,7 +39,7 @@ try {
     	}
     }
 
-    //check 
+    //check driver-specific error code
     try {
     	driverError = results.getUnsignedIntegerValue(Win32WPDDefines.WPD_PROPERTY_COMMON_DRIVER_ERROR_CODE);
     	System.out.println("Driver Error Code: " + driverError);
