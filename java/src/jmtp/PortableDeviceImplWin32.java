@@ -62,6 +62,7 @@ class PortableDeviceImplWin32 implements PortableDevice {
     private native void openImpl(PortableDeviceValuesImplWin32 values) throws COMException;
     private native void closeImpl() throws COMException;
     native PortableDeviceContentImplWin32 getDeviceContent() throws COMException;
+    public native PortableDeviceValuesImplWin32 sendCommand(PortableDeviceValuesImplWin32 values) throws COMException;
     
     /*
      * In Java geïmplementeerde methoden
@@ -359,9 +360,57 @@ class PortableDeviceImplWin32 implements PortableDevice {
 		String wmp_id = "{00128F26-0000-0000-0000-000000000000}";
     	
     	
-    	PortableDeviceManager manager = new PortableDeviceManager();
-    	PortableDevice device = manager.getDevices()[0];
+    	PortableDeviceManager manager;
+    	PortableDevice device;
+    	PortableDeviceImplWin32 device32;
+    	PortableDeviceValuesImplWin32 input;
+    	PortableDeviceValuesImplWin32 results;
+    	COMException wpdError;
+    	long driverError;
+    	
+    	manager = new PortableDeviceManager();
+    	device = manager.getDevices()[0];
     	device.open();
+    	
+    	PropertyKey commandKey = Win32WPDDefines.WPD_COMMAND_COMMON_RESET_DEVICE;
+    	
+    	device32 = (PortableDeviceImplWin32)device;
+    	try {
+    		input = new PortableDeviceValuesImplWin32();
+    		input.setGuidValue(Win32WPDDefines.WPD_PROPERTY_COMMON_COMMAND_CATEGORY, 
+        			commandKey.getFmtid());
+    		input.setUnsignedIntegerValue(Win32WPDDefines.WPD_PROPERTY_COMMON_COMMAND_ID, 
+        			commandKey.getPid());
+    		
+    		results = device32.sendCommand(input);
+    		
+    		//check for success or failure to carry out the command
+    		try {
+    			wpdError = results.getErrorValue(Win32WPDDefines.WPD_PROPERTY_COMMON_HRESULT);
+    		}
+    		catch(COMException e) {
+    			//ignore exception if "ERROR_NOT_FOUND" -> item not in collection
+    			if (e.getHresult() != Win32WPDDefines.ERROR_NOT_FOUND) {
+    				System.out.println("Error: " + e.getErrorCode());
+    			}
+    		}
+
+    		//check driver-specific error code
+    		try {
+    			driverError = results.getUnsignedIntegerValue(Win32WPDDefines.WPD_PROPERTY_COMMON_DRIVER_ERROR_CODE);
+    			System.out.println("Driver Error Code: " + driverError);
+    		}
+    		catch(COMException e) {
+    			//ignore exception if "ERROR_NOT_FOUND" -> item not in collection
+    			if (e.getHresult() != Win32WPDDefines.ERROR_NOT_FOUND) {
+    				System.out.println("Error: " + e.getErrorCode());
+    			}
+    		}
+    	}
+    	catch(COMException e) {
+    		System.out.println("Error: " + e.getErrorCode());
+    	}
+    	
     	/*
     	PortableDeviceStorageObject storage = (PortableDeviceStorageObject)device.getRootObjects()[0];
     	PortableDeviceObject o = storage.getChildObjects()[5];

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Pieter De Rycke
+ * Copyright 2010 Pieter De Rycke
  * 
  * This file is part of JMTP.
  * 
@@ -168,6 +168,22 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setUnsignedLargeI
  * Signature: (Ljmtp/PropertyKey;)Ljava/math/BigInteger;
  */
 JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getUnsignedLargeIntegerValue
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     jmtp_PortableDeviceValuesImplWin32
+ * Method:    setBufferValue
+ * Signature: (Ljmtp/PropertyKey;[B)V
+ */
+JNIEXPORT void JNICALL Java_jmtp_PortableDeviceValuesImplWin32_setBufferValue
+  (JNIEnv *, jobject, jobject, jbyteArray);
+
+/*
+ * Class:     jmtp_PortableDeviceValuesImplWin32
+ * Method:    getBufferValue
+ * Signature: (Ljmtp/PropertyKey;)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_jmtp_PortableDeviceValuesImplWin32_getBufferValue
   (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus

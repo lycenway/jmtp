@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Pieter De Rycke
+ * Copyright 2010 Pieter De Rycke
  * 
  * This file is part of JMTP.
  * 
@@ -73,6 +73,14 @@ JNIEXPORT void JNICALL Java_jmtp_PortableDeviceImplWin32_closeImpl
  */
 JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceImplWin32_getDeviceContent
   (JNIEnv *, jobject);
+
+/*
+ * Class:     jmtp_PortableDeviceImplWin32
+ * Method:    sendCommand
+ * Signature: (Ljmtp/PortableDeviceValuesImplWin32;)Ljmtp/PortableDeviceValuesImplWin32;
+ */
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceImplWin32_sendCommand
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

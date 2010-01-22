@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Pieter De Rycke
+ * Copyright 2010 Pieter De Rycke
  * 
  * This file is part of JMTP.
  * 
@@ -168,6 +168,44 @@ JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceImplWin32_getDeviceContent
 	reference = env->NewObject(cls, mid, pContent);
 	
 	cls = env->FindClass("jmtp/PortableDeviceContentImplWin32");
+	mid = env->GetMethodID(cls, "<init>", "(Lbe/derycke/pieter/com/COMReference;)V");
+	return env->NewObject(cls, mid, reference);
+}
+
+JNIEXPORT jobject JNICALL Java_jmtp_PortableDeviceImplWin32_sendCommand
+	(JNIEnv* env, jobject obj, jobject values)
+{
+	HRESULT hr;
+	IPortableDevice* pDevice;
+	IPortableDeviceValues* pValuesIn;
+	IPortableDeviceValues* pValuesOut;
+	jclass cls;
+	jmethodID mid;
+	jobject reference;
+
+	pDevice = GetPortableDevice(env, obj);
+
+	//clientinfo value object opvragen
+	mid = env->GetMethodID(env->GetObjectClass(values), "getReference", 
+		"()Lbe/derycke/pieter/com/COMReference;");
+	reference = env->CallObjectMethod(values, mid);
+	mid = env->GetMethodID(env->FindClass("be/derycke/pieter/com/COMReference"), "getMemoryAddress", "()J");
+	pValuesIn = (IPortableDeviceValues*)env->CallLongMethod(reference, mid);
+
+	hr = pDevice->SendCommand(0, pValuesIn, &pValuesOut);
+
+	if(FAILED(hr))
+	{
+		ThrowCOMException(env, L"The custom command failed.", hr);
+		return NULL;
+	}
+
+	//smart reference object aanmaken
+	cls = env->FindClass("be/derycke/pieter/com/COMReference");
+	mid = env->GetMethodID(cls, "<init>", "(J)V");
+	reference = env->NewObject(cls, mid, pValuesOut);
+	
+	cls = env->FindClass("jmtp/PortableDeviceValuesImplWin32");
 	mid = env->GetMethodID(cls, "<init>", "(Lbe/derycke/pieter/com/COMReference;)V");
 	return env->NewObject(cls, mid, reference);
 }
